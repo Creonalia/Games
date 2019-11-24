@@ -1,44 +1,47 @@
-import random
 import pygame
 pygame.init()
 
-w = pygame.display.set_mode([200, 200])
-p = True
+#setup
+w = pygame.display.set_mode([900,900])
+w.fill((255,255,255))
+black = (0,0,0)
+pygame.draw.line(w, black, (0, 300), (900, 300), 5)
+pygame.draw.line(w, black, (0, 600), (900, 600), 5)
+pygame.draw.line(w, black, (300, 0), (300, 900), 5)
+pygame.draw.line(w, black, (600, 0), (600, 900), 5)
+pygame.display.flip()
 
-while p:
-    red = random.randint(0, 255)
-    green = random.randint(0, 255)
-    blue = random.randint(0, 255)
-    color = (red, green, blue)
-    
-    r = pygame.Rect(0, 0, 200, 200)
-    pygame.draw.rect(w, color, r)
-    
+p1win = False
+p2win = False
+p1turn = True
+board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+valid = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+
+spot = 9
+
+while not p1win and not p2win:
+    while spot not in valid:
+        try:
+            spot = int(input("Pick a square (0-8) "))
+        except:
+            continue
+    valid.remove(spot)
+    if p1turn:
+        board[spot] = 1
+        x = spot % 3 * 300
+        y = spot // 3 * 300
+        pygame.draw.line(w, black, (x,y), (x + 300, y + 300), 7)
+        x = spot % 3 * 300
+        y = spot // 3 * 300 + 300
+        pygame.draw.line(w, black, (x,y), (x + 300, y - 300), 7)
+    else:
+        board[spot] = 2
+        x = spot % 3 * 300 + 150
+        y = spot // 3 * 300 + 150
+        pygame.draw.circle(w, black, (x, y), 150, 5)
     pygame.display.flip()
-    print()
-    redg = int(input("How much red? "))
-    greeng = int(input("How much green? "))
-    blueg = int(input("How much blue? "))
-    colorg = (redg, greeng, blueg)
-    
-    wg = pygame.display.set_mode([400,200])
-    wg.fill(colorg)
-    pygame.draw.rect(w, color, r)
-    
-    pygame.display.flip()
-    
-    print("You guessed " + str(colorg))
-    print("It was " + str(color))
-    if red > redg:
-        print("Red was " + str(red-redg) + " too high")
-    else:
-        print("Red was " + str(redg-red) + " too low")
-    if green > greeng:
-        print("Green was " + str(green-greeng) + " too high")
-    else:
-        print("Green was " + str(greeng - green) + " too low")
-    if blue > blueg:
-        print("Blue was " + str(blue-blueg) + " too high")
-    else:
-        print("Blue was " + str(blueg - blue) + " too low")
-    p = input("Again? ").lower() == "yes"
+    if input("asfasfsf") == "q":
+        p1win = True
+    p1turn = not p1turn
+
+ 
