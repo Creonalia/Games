@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 
-def draw_board()
+def setup()
     w = pygame.display.set_mode([900,900])
     w.fill((255,255,255))
     black = (0,0,0)
@@ -10,6 +10,12 @@ def draw_board()
     pygame.draw.line(w, black, (300, 0), (300, 900), 5)
     pygame.draw.line(w, black, (600, 0), (600, 900), 5)
     pygame.display.flip()
+    player_win = False
+    computer_win = False
+    player_turn = True
+    board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    valid = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    spot = 9
 
 def draw_x(spot):
     x = spot % 3 * 300
@@ -24,21 +30,16 @@ def draw_o(spot):
     y = spot // 3 * 300 + 150
     pygame.draw.circle(w, black, (x, y), 150, 5)
 
-p1win = False
-p2win = False
-p1turn = True
-board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-valid = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-spot = 9
 
-while not p1win and not p2win:
+
+while not player_win and not computer_win:
     while spot not in valid:
         try:
             spot = int(input("Pick a square (0-8) "))
         except:
             continue
     valid.remove(spot)
-    if p1turn:
+    if player_turn:
         board[spot] = 1
         draw_x(spot)
     else:
@@ -46,7 +47,10 @@ while not p1win and not p2win:
         draw_o(spot)
     pygame.display.flip()
     if input("asfasfsf") == "q":
-        p1win = True
-    p1turn = not p1turn
-
- 
+        player_win = True
+    if valid = []:
+        break
+    player_turn = not player_turn
+if player_win:
+    print("You win!")
+els
