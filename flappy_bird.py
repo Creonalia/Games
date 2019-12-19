@@ -18,7 +18,6 @@ player = pygame.Rect(75, 200, 20, 20)
 btl = (at,bt,ct)
 bl = (at, ab, bt, bb, ct, cb)
 bspeed = 3
-increase = False
 score = 0
 bc = (70, 50, 70)
 while not start:
@@ -42,17 +41,17 @@ while r:
     # move blocks
     for b in btl:
         b.x -= bspeed
-    player.y += 4
+    player.y += 5
     # reset blocks
     for b in btl:
         if b.x <= -width:
             b.x = 650
-            b.height = random.randint(0, 300)
+            b.height = random.randint(0, 250)
             
     for b in btl:
         if b.x + width >= player.x  and b.x + width < player.x + bspeed:
             score += 1
-            increase = True
+            
     ab.x = at.x
     bb.x = bt.x
     cb.x = ct.x
@@ -66,9 +65,7 @@ while r:
         if player.x + player.height >= i.x and player.x <= i.x + width:
              if player.y <= i.height or player.y >i.height + width- player.height:
                 r = False
-    if score % 5 == 0 and increase:
-        bspeed += 1
-        increase = False
+
 
     # draw
     w.fill((200,220,255))
