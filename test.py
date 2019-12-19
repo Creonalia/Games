@@ -69,6 +69,6 @@ while playing:
     else:
         print("It was a tie.")
         ties += 1
-    playing = input("Again? ") == "n"
+    playing = input("Again? ") == "y"
 
 end_result(wins, ties, losses)
