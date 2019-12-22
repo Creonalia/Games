@@ -22,7 +22,7 @@ deaths = 0
 player = pygame.Rect(0, 500, 50, 50)
 ground = pygame.Rect(0, 550, 600, 500)
 
-room = 4
+room = 0
 r1_0 = pygame.Rect(200, ground.y - 1, 400, ground.height + 1) 
 r1_1 = pygame.Rect(150,450, 100, 50)
 r1_2 = pygame.Rect(300, 350, 100, 50)
@@ -40,8 +40,8 @@ r2_6 = pygame.Rect(300, 300, 100, 50)
 r2_7 = pygame.Rect(100, 250, 100, 50)
 r2_8 = pygame.Rect(350, 150, 100, 50)
 
-r3_0 = pygame.Rect(100, 549, 50, 51)
-r3_2 = pygame.Rect(350, 549, 50, 51)
+r3_0 = pygame.Rect(100, 549, 30, 51)
+r3_2 = pygame.Rect(350, 549, 30, 51)
 r3_4 = pygame.Rect(500, 450, 50, 50)
 r3_5 = pygame.Rect(300, 350, 150, 25)
 r3_6 = pygame.Rect(300, 325, 150, 25)
@@ -50,10 +50,10 @@ r3_8 = pygame.Rect(50, r3_5.y, 150, r3_5. height)
 r3_9 = pygame.Rect(50, 325, 150, 25)
 r3_10 = pygame.Rect(100, r3_9.y -1, 50, r3_9.height + 1)
 r3_11 = pygame.Rect(0, 200, 30, 50)
-r3_12 = pygame.Rect(100, 120, 150,5)
-r3_13 = pygame.Rect(100, 95, 150, 25)
-r3_14 = pygame.Rect(350, 120, 150, 5)
-r3_15 = pygame.Rect(350, 95, 150, 25)
+r3_12 = pygame.Rect(80, 120, 170,5)
+r3_13 = pygame.Rect(80, 95, 170, 25)
+r3_14 = pygame.Rect(330, 120, 150, 25)
+r3_15 = pygame.Rect(330, 95, 150, 45)
 r3_16 = pygame.Rect(550, 150, 50, 450)
 r3_17 = pygame.Rect(550, 100, 50, 50)
 
@@ -164,7 +164,7 @@ while running:
         pygame.draw.rect(w, color, block)
     
     if room == 0:
-        f.render_to(w, (1000, 10), "Use WASD or Arrow Keys to move")
+        f.render_to(w, (10, 10), "Use WASD or Arrow Keys to move")
     elif room == 4:
         f.render_to(w, (150, 10), "Thanks for playing")
         f.render_to(w, (160, 50), "You died " + str(deaths) + " times")
