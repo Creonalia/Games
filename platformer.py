@@ -98,7 +98,7 @@ while running:
 
     # edge collision
     if player.x > 600:
-        player.x = ground.x
+        player.x = ground.x 
         player.y = ground.y - player.height
         room += 1
         if room >= 5:
