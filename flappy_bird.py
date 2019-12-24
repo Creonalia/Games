@@ -77,4 +77,4 @@ while r:
     c.tick(25)
     pygame.display.flip()
 
-print("Your score is " + str(score))
+print("Your score is " + str(score)) 
