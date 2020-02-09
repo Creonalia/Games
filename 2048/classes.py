@@ -7,9 +7,10 @@ size = 200
 
 class Block(pygame.Rect):
     colors = {
-        2: (0,0,0), 4: (0,0,0), 8: (0,0,0), 16: (0,0,0), 32: (0,0,0), 
-        64: (0,0,0), 128: (0,0,0), 256: (0,0,0), 512: (0,0,0), 1024: (0,0,0), 
-        2048: (0,0,0), 4096: (0,0,0)
+        2: (238, 228, 218), 4: (236, 224, 202), 8: (247, 171, 109), 
+        16: (245, 149, 101), 32: (245, 124, 95), 64: (246, 93, 59), 
+        128: (237, 206, 113), 256: (237, 205, 92), 512: (237, 199, 80), 
+        1024: (237, 196, 64), 2048: (237, 193, 46), 4096: (62, 57, 51)
         }
     offset = 10
     def __init__(self, column, row, value=2):
@@ -33,11 +34,16 @@ class Board():
         pass
 
     def draw(self, window, font):
-        for block in [block for row in self.board for block in row]:
+        pygame.draw.rect(window, (205, 193, 181), (0, 200, 800, 800))
+        for i in range(int(Block.offset/2), 800, size):
+            pygame.draw.line(window, (188, 174, 161), (i, 200), (i, 1000), Block.offset)
+            pygame.draw.line(window, (188, 174, 161), (0, i + 200), (800, i + 200), Block.offset)
+        for block in [block for row in self.board for block in row if block]:
             if block.value in colors:
                 pygame.draw.rect(window, Block.colors[block.value], block)
             else:
-                pygame.draw.rect(window)
+                pygame.draw.rect(window, Block.colors[4096], block)
+            # text
 
 
     def check_end_game():
@@ -47,8 +53,19 @@ class Game():
 
     def __init__(self):
         self.score = 0
+        self.high_score = 0
+        self.board = Board()
+    
+    def draw(self, window, font):
+        window.fill((252, 247, 241))
+        self.board.draw(window, font)
+        # draw score
+        # draw restart button
+        pygame.display.flip()
 
-s = Board()
-s.draw(1, 1)
+    def restart(self):
+        self.score = 0
+        self.board.board = [[None for column in range(0, 4)] for row in range(0, 4)]
+
 # high score
 # credits

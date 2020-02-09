@@ -1,6 +1,11 @@
-from setup import *
+from classes import *
 
+# pygame setup
+window = pygame.display.set_mode([800, 1000])
+clock = pygame.time.Clock()
+times_new_roman = pygame.freetype.SysFont(None, 50)
 
+game = Game()
 
 # main loop
 running = True
@@ -20,5 +25,6 @@ while running:
                 pass
             elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                 pass
-
-             
+    game.draw(window, times_new_roman)
+    clock.tick(30)
+# credits
