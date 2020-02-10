@@ -18,13 +18,23 @@ while running:
             break
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w or event.key == pygame.K_UP:
-                pass
+                x = False
+                positive = False
             elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                pass
+                x = True
+                positive = False
             elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                pass
+                x = False
+                positive = True
             elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                pass
+                x = True
+                positive = True 
+            else:
+                continue
+            game.board.move(x, positive)
+
     game.draw(window, times_new_roman)
+
+    pygame.display.flip()
     clock.tick(30)
 # credits
