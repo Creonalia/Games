@@ -1,9 +1,9 @@
-from classes import *
+from classes_new import *
 
 # pygame setup
 window = pygame.display.set_mode([800, 1000])
 clock = pygame.time.Clock()
-times_new_roman = pygame.freetype.SysFont(None, 50)
+pygame_font = pygame.freetype.SysFont(None, 50)
 
 game = Game()
 
@@ -31,9 +31,13 @@ while running:
                 positive = True 
             else:
                 continue
-            game.board.move(x, positive)
+            if game.board.check_can_move:
+                game.board.move(x, positive, game)
+            else:
+                game.restart()
 
-    game.draw(window, times_new_roman)
+    game.draw(window, pygame_font)
+    if game.score > game.
 
     pygame.display.flip()
     clock.tick(30)
