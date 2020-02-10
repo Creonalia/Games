@@ -25,6 +25,12 @@ class Cell(pygame.Rect):
     
     def __repr__(self):
         return f"<{self.value}, {self.x}, {self.y}, {self.width}, {self.height}>"
+
+    def draw_text(self, window, font):
+        value_text = font.render(str(self.value))[0]
+        value_position = value_text.get_rect(center = self.center)
+        window.blit(value_text, value_position)
+
                 
 class Board(): 
 
@@ -61,22 +67,33 @@ class Board():
                             
                         else:
                             break
-        self.make_new_block()
+     
 
     def check_can_move(self):
+        if not self.check_full():
+            return True
         for i in range(4):
             row_indexes = list(range(i * 4, i * 4 + 4))
             column_indexes = list(range(i, 16, 4))
             for indexes in (row_indexes, column_indexes):
                 for j in indexes:
+                    if j is indexes[0]:
+                        continue
                     if self.cells[j].value == self.cells[indexes[indexes.index(j) - 1]].value:
                         return True
         return False
+    
+    def check_full(self):
+        for cell in self.cells:
+            if cell.value == 0:
+                return False
+        return True
+
     def make_new_block(self):
         empty_blocks = [i for i in range(16) if self.cells[i].value == 0]  
         empty_index = random.choice(empty_blocks)
         self.cells[empty_index] = Cell(empty_index, 2)
-
+    
     def draw(self, window, font):
         pygame.draw.rect(window, (205, 193, 181), (0, 200, 800, 800))
         for i in range(0, 900, size):
@@ -87,12 +104,14 @@ class Board():
             if block.value > 0:
                 if block.value in Cell.colors:
                     pygame.draw.rect(window, Cell.colors[block.value], block)
+                    block.draw_text(window, font)
                 else:
                     pygame.draw.rect(window, Cell.colors[4096], block)
+                    block.draw_text(window, font)
                 
-                value_text = font.render(str(block.value))[0]
-                value_position = value_text.get_rect(center = block.center)
-                window.blit(value_text, value_position)
+                
+    
+
 class Game():
 
     def __init__(self):
@@ -113,6 +132,7 @@ class Game():
             self.high_score = self.score 
         self.score = 0
         self.board = Board()
+        # end game screen
     
 
 # high score

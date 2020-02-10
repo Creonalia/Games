@@ -31,13 +31,18 @@ while running:
                 positive = True 
             else:
                 continue
-            if game.board.check_can_move:
+            if game.board.check_can_move():
                 game.board.move(x, positive, game)
+                if not game.board.check_full():
+                    game.board.make_new_block()
             else:
                 game.restart()
+            
+                
 
     game.draw(window, pygame_font)
-    if game.score > game.
+    if game.score > game.high_score:
+        game.high_score = game.score
 
     pygame.display.flip()
     clock.tick(30)
