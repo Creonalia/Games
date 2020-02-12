@@ -39,10 +39,7 @@ class Board():
         self.make_new_block()
         self.make_new_block()
 
-    def fill_board_with_2048s(self):
-        self.cells = [Cell(i, 2048) for i in range(16)]
-
-    def move(self, x, positive, game):
+    def move_blocks(self, x, positive, game):
         for i in range(4):
             if x:
                 indexes = list(range(i * 4, i * 4 + 4))
@@ -54,20 +51,20 @@ class Board():
             for j in indexes:
                 if self.cells[j].value > 0:
                     has_merged = False
+                    neighbor = self.cells[indexes[indexes.index(j) - 1]]
                     while self.cells[j] != self.cells[indexes[0]]:
-                        if self.cells[indexes[indexes.index(j) - 1]].value == 0:
-                            self.cells[indexes[indexes.index(j) - 1]].value = self.cells[j].value
+                        if neighbor.value == 0:
+                            neighbor.value = self.cells[j].value
                             self.cells[j].value = 0
                             j = indexes[indexes.index(j) - 1]
-                        elif self.cells[j].value == self.cells[indexes[indexes.index(j) - 1]].value and not has_merged:
+                            neighbor = self.cells[indexes[indexes.index(j) - 1]]
+                        elif self.cells[j].value == neighbor.value and not has_merged:
                             self.cells[j].value *= 2
                             game.score += self.cells[j].value
-                            self.cells[indexes[indexes.index(j) - 1]].value = 0
-                            has_merged = True
-                            
+                            neighbor.value = 0
+                            has_merged = True   
                         else:
-                            break
-     
+                            break  
 
     def check_can_move(self):
         if not self.check_full():
@@ -94,23 +91,27 @@ class Board():
         empty_index = random.choice(empty_blocks)
         self.cells[empty_index] = Cell(empty_index, 2)
     
-    def draw(self, window, font):
+    def draw_board(self, window, font):
         pygame.draw.rect(window, (205, 193, 181), (0, 200, 800, 800))
         for i in range(0, 900, size):
             pygame.draw.line(window, (188, 174, 161), (i, 200), (i, 1000), Cell.offset * 2)
             pygame.draw.line(window, (188, 174, 161), (0, i + 200), (800, i + 200), Cell.offset * 2)
-
-        for block in self.cells: 
-            if block.value > 0:
-                if block.value in Cell.colors:
-                    pygame.draw.rect(window, Cell.colors[block.value], block)
-                    block.draw_text(window, font)
-                else:
-                    pygame.draw.rect(window, Cell.colors[4096], block)
-                    block.draw_text(window, font)
-                
-                
     
+        for cell in self.cells: 
+            if cell.value > 0:
+                if cell.value in Cell.colors:
+                    pygame.draw.rect(window, Cell.colors[cell.value], cell)
+                    cell.draw_text(window, font)
+                else:
+                    pygame.draw.rect(window, Cell.colors[4096], cell)
+                    cell.draw_text(window, font)
+                
+class Button(pygame.Rect):
+
+    def __init__(self, type_, visible, x, y, width, height):              
+        super().__init__(x, y, width, height)
+        self.type_ = type_
+        self.visible = visible
 
 class Game():
 
@@ -118,15 +119,21 @@ class Game():
         self.score = 0
         self.high_score = 0
         self.board = Board()
+        self.window = pygame.display.set_mode([800, 1000])
+        self.clock = pygame.time.Clock()
+        self.font = pygame.freetype.SysFont(None, 50)
     
-    def draw(self, window, font):
-        window.fill((252, 247, 241))
-        self.board.draw(window, font)
-        font.render_to(window, (20, 20), f"Score: {self.score}")
-        font.render_to(window, (20, 80), f"High Score: {self.high_score}")
+    def draw(self):
+        self.window.fill((252, 247, 241))
+        self.board.draw_board(self.window, self.font)
+        self.font.render_to(self.window, (20, 20), f"Score: {self.score}")
+        self.font.render_to(self.window, (20, 80), f"High Score: {self.high_score}")
         # draw restart button
         pygame.display.flip()
-    
+
+    def end_game(self):
+        pass
+
     def restart(self):
         if self.score > self.high_score:
             self.high_score = self.score 

@@ -1,9 +1,5 @@
 from classes_new import *
 
-# pygame setup
-window = pygame.display.set_mode([800, 1000])
-clock = pygame.time.Clock()
-pygame_font = pygame.freetype.SysFont(None, 50)
 
 game = Game()
 
@@ -32,18 +28,16 @@ while running:
             else:
                 continue
             if game.board.check_can_move():
-                game.board.move(x, positive, game)
+                game.board.move_blocks(x, positive, game)
                 if not game.board.check_full():
                     game.board.make_new_block()
-            else:
-                game.restart()
-            
-                
+    
+    if not game.board.check_can_move():
+        game.restart()           
 
-    game.draw(window, pygame_font)
+    game.draw()
     if game.score > game.high_score:
         game.high_score = game.score
 
     pygame.display.flip()
-    clock.tick(30)
-# creditsa
+    game.clock.tick(30)
