@@ -1,17 +1,21 @@
-from classes_new import *
+import classes_new
+from classes_new import pygame
 
+game = classes_new.Game("Normal")
 
-game = Game()
-
-# main loop
+# main game loop
 running = True
 while running:
     
     # event loop
     for event in pygame.event.get():
+
+        # check for quit
         if event.type == pygame.QUIT:
             running = False
             break
+
+        # check player movement
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w or event.key == pygame.K_UP:
                 x = False
@@ -28,16 +32,20 @@ while running:
             else:
                 continue
             if game.board.check_can_move():
+                old_board_values = [game.board.cells[i].value for i in range(16)]
                 game.board.move_blocks(x, positive, game)
-                if not game.board.check_full():
+
+                # does not create new block if board is full or the board did not change
+                if not game.board.check_full() and old_board_values != [game.board.cells[i].value for i in range(16)]:
                     game.board.make_new_block()
     
     if not game.board.check_can_move():
         game.restart()           
-
-    game.draw()
     if game.score > game.high_score:
         game.high_score = game.score
 
+    game.draw()
     pygame.display.flip()
     game.clock.tick(30)
+# high_score
+# credits
