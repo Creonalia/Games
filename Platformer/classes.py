@@ -20,15 +20,11 @@ class Player(pygame.Rect):
 
     # initalizing player
     def __init__(self):
-        self.x = 0
-        self.y = 500
-        self.width = 50
-        self.height = 50
-        super().__init__(self.x, self.y, self.width, self.height)
+        super().__init__(0, 500, 50, 50)
         self.deaths = 0
         self.jumps = self.default_jumps
         self.bounces = 0
-    
+        self.died = False    
     # moving player
     def move(self):
         keys = pygame.key.get_pressed()
@@ -52,28 +48,34 @@ class Player(pygame.Rect):
             self.y -= self.bounce_height
             self.bounces -= 1
             self.jumps = 0
- 
+    
+    def reset_position(self, block):
+        self.x = block.x 
+        self.bottom = block.y
 
-# class for blocks
 class Block(pygame.Rect):
-    # colors for differnt blocks
+
     colors = {"Normal": (100, 100, 100), "Lava": (200, 50, 50), "Bouncy": (50, 50, 200), "Exit": (0,0,0)}
-    # initalize blocks
+
     def __init__(self, x, y, width, height, kind = "Normal", offset = 0, movement_distance = 0, axis = "", speed = 6):
-        self.offset = offset
-        self.x = x * 25
-        self.y = (y * 25) - self.offset
-        self.width = width * 25
-        self.height = height * 25 + abs(self.offset)
-        super().__init__(self.x, self.y, self.width, self.height)
+        super().__init__(x * 25, y * 25 - offset, width * 25, height * 25 + abs(offset))
         self.kind = kind
         self.movement_distance = movement_distance
         self.axis = axis
         self.speed = speed
         self.default_y = self.y
         self.default_x = self.x
+    
+    def move_block(self):
+        if self.axis == "x":
+            self.x += self.speed
+            if self.x == self.default_x or self.x >= self.default_x + self.movement_distance:
+                self.speed *= -1
+        if self.axis == "y":
+            self.y += block.speed
+            if self.y == self.default_y or self.x >= self.default_y + self.movement_distance:
+                self.speed *= -1
 
-# class for text
 class Text():
     # initalize blocks
     def __init__(self, point, message):
@@ -88,8 +90,7 @@ class Room():
         self.text = text
     
     # draws all blocks and text in room
-    def animate(self, window, font, ticks):
-        ticks_30 = ticks % 30
+    def animate(self, window, font, ticks_30):
         for block in self.blocks:
             if block.kind != "Exit":
                 pygame.draw.rect(window, block.colors[block.kind], block)
@@ -114,14 +115,7 @@ class Room():
                     block.height += 2
             # move moving blocks
             if block.movement_distance:
-                if block.axis == "x":
-                    block.x += block.speed
-                    if block.x == block.default_x or block.x >= block.default_x + block.movement_distance:
-                        block.speed *= -1
-                if block.axis == "y":
-                    block.y += block.speed
-                    if block.y == block.default_y or block.x >= block.default_y + block.movement_distance:
-                        block.speed *= -1
+                block.move_block()
             
         for text in self.text:
             font.render_to(window, text.point, text.message) 

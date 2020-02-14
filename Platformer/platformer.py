@@ -3,8 +3,6 @@ platformer
 
 Description: Main game
 """
-# imports setup and all variables
-import setup
 from setup import *
 
 # gameplay loop
@@ -31,28 +29,27 @@ while running:
         player.jumps = 0
         player.bounces = 0
 
-
-    #block collision
+    # block collision
     for block in rooms[room].blocks:
         if pygame.Rect.colliderect(player, block):
 
             # check for special blocks
             if block.kind == "Lava":
-                died = True
+                player.died = True
                 break
                 
             elif block.kind == "Bouncy" and player.y < block.y:
                 player.bounces = 10
                 
             elif block.kind == "Exit":
-                player.x = ground.x 
-                player.y = ground.y - player.height
+                player.reset_position(ground)
                 room += 1
                 if room >= len(rooms):
                     running = False
                 break
+
             # move player with moving block
-            if block.movement_distance:
+            if block.movement_distance and player.y > block.y:
                 if block.axis == "x":
                     player.x += block.speed
                 else:
@@ -60,19 +57,19 @@ while running:
 
             # checks player location and moves player out of block 
             if player.y > block.y:
-                player.y = block.y + block.height
+                player.top = block.bottom
                 player.jumps = 0
                 player.bounces = 0
                 
             elif player.y < block.y:
-                player.y = block.y - player.height
+                player.bottom = block.top
                 player.jumps = player.default_jumps
                 
             elif player.x > block.x:
-                player.x = block.x + block.width
+                player.left = block.right
                 
             elif player.x < block.x:
-                player.x = block.x - player.width
+                player.right = block.left
                 
     # prevents errors when the game has ended but the loop has not finished
     if running == False:
@@ -81,28 +78,24 @@ while running:
     # draw room and player
     window.fill((255,255,255))  
     pygame.draw.rect(window, (0,0,0), player)
-    rooms[room].animate(window, times_new_roman, ticks)
+    rooms[room].animate(window, times_new_roman, ticks%30)
     
     # update end statistics
-    end_1 = t((160, 50), "You died " + str(player.deaths) + " times")
-    end_2 = t((60, 90), "You played for " + str(pygame.time.get_ticks()/1000) +  " seconds") 
-    end = classes.Room((ground, exit_0), (end_0, end_1, end_2))
-
-    rooms = (start, r1, r2, r3, end)
+    if rooms[room] is end:
+        end.text[1].message = "You died " + str(player.deaths) + " times"
+        end.text[2].message = "You played for " + str(pygame.time.get_ticks()//1000) +  " seconds"
     
     # death animation
-    if died:
-        
+    if player.died:      
         for i in range(0, 255, 15):
-            surface.set_alpha(i)
-            window.blit(surface, (0, 0))
+            death_surface.set_alpha(i)
+            window.blit(death_surface, (0, 0))
             pygame.display.flip()
             clock.tick(30)
             
         player.deaths += 1                
-        player.x = ground.x
-        player.y = ground.y - player.height
-        died = False
+        player.reset_position(ground)
+        player.died = False
     
     # finish drawing
     pygame.display.flip()
