@@ -1,7 +1,9 @@
 import classes_new
 from classes_new import pygame
 
-game = classes_new.Game("Normal")
+normal = classes_new.Game_Mode("Normal", 2)
+eleven = classes_new.Game_Mode("Eleven", 1)
+game = classes_new.Game(normal)
 
 # main game loop
 running = True
@@ -38,14 +40,13 @@ while running:
                 # does not create new block if board is full or the board did not change
                 if not game.board.check_full() and old_board_values != [game.board.cells[i].value for i in range(16)]:
                     game.board.make_new_block()
-    
-    if not game.board.check_can_move():
-        game.restart()           
-    if game.score > game.high_score:
-        game.high_score = game.score
+            game.draw()
+            if not game.board.check_can_move():
+                game.restart()           
+            if game.score > game.high_score:
+                game.high_score = game.score
 
-    game.draw()
-    pygame.display.flip()
+    
     game.clock.tick(30)
 # high_score
 # credits

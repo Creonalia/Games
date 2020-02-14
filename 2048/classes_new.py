@@ -33,6 +33,7 @@ class Board():
     def __init__(self, size = 4, cell_size = 200):
         self.size = size
         self.cell_size = cell_size
+        self.number_of_cells = self.size ** 2
         # creates empty board and adds 2 random blocks
         self.cells = [Cell(i, cell_size) for i in range(16)]
         self.make_new_block()
@@ -72,7 +73,7 @@ class Board():
         if not self.check_full():
             return True
         for i in range(4):
-            row_indexes = list(range(i * 4, i * 4 + 4))
+            row_indexes = list(range(i * self.size, i * self.size + self.size))
             column_indexes = list(range(i, 16, 4))
             for indexes in (row_indexes, column_indexes):
                 for j in indexes:
@@ -115,8 +116,22 @@ class Button(pygame.Rect):
         self.type_ = type_
         self.visible = visible
 
+class Game_Mode():
+
+    def __init__(self, mode, start_value, size = 4):
+        self.mode = mode
+        self.size = size
+        self.number_of_cells = size ** 2
+        self.cell_size = int(800/size)
+        self.start_value = start_value
+
+    def increase(self, value):
+        if self.mode == "Normal":
+            return value * 2
+        elif self.mode == "Eleven":
+            return value + 1
 class Game():
-    game_mode = {"Normal": (4, 200)}
+    #game_mode = {"Normal": (4, 200)}
     window = pygame.display.set_mode([800, 1000])
     clock = pygame.time.Clock()
     font = pygame.freetype.SysFont(None, 50)
@@ -125,7 +140,7 @@ class Game():
         # change high_score
         self.high_score = 0
         self.mode = mode
-        self.board = Board(Game.game_mode[mode][0], Game.game_mode[mode][1])
+        self.board = Board(self.mode.size, self.mode.cell_size)
         
     
     def draw(self):
