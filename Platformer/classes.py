@@ -4,14 +4,12 @@ classes
 Description: Defines classes for platformer
 Do not run! The main game is platformer.py
 """
-# setup pygame
 import pygame
 import pygame.freetype
 pygame.init()
 
 gravity = 10
 
-# class for player
 class Player(pygame.Rect):
     default_jumps = 15
     jump_height = 20
@@ -67,6 +65,7 @@ class Block(pygame.Rect):
         self.default_x = self.x
     
     def move_block(self):
+        """Moves moving blocks"""
         if self.axis == "x":
             self.x += self.speed
             if self.x == self.default_x or self.x >= self.default_x + self.movement_distance:
@@ -76,6 +75,13 @@ class Block(pygame.Rect):
             if self.y == self.default_y or self.x >= self.default_y + self.movement_distance:
                 self.speed *= -1
 
+    def change_size(self, increase):
+        """Changes the size of exit blocks"""
+        self.x += 1 * increase
+        self.y += 1 * increase
+        self.width -= 2 * increase
+        self.height -= 2 * increase
+        
 class Text():
     # initalize blocks
     def __init__(self, point, message):
@@ -84,7 +90,7 @@ class Text():
         
 # class which holds blocks and text for each room       
 class Room():
-    # initalize room
+
     def __init__(self, blocks = (), text = ()):
         self.blocks = blocks
         self.text = text
@@ -104,15 +110,10 @@ class Room():
             else:
                 pygame.draw.ellipse(window, block.colors[block.kind], block)
                 if ticks_30 < 15 and ticks_30 % 2 == 0:
-                    block.x += 1
-                    block.y += 1
-                    block.width -= 2
-                    block.height -= 2
+                    block.change_size(1)
                 elif ticks_30 % 2 == 0 or block.width <= 34:
-                    block.x -= 1
-                    block.y -= 1
-                    block.width += 2
-                    block.height += 2
+                    block.change_size(-1)
+            
             # move moving blocks
             if block.movement_distance:
                 block.move_block()

@@ -5,7 +5,6 @@ Description: Setup for platformer
 Do not run! The main game is platformer.py
 """
 
-# imports classes and all variables
 from classes import *
 
 # pygame variables
@@ -18,7 +17,7 @@ times_new_roman = pygame.freetype.SysFont("Times New Roman", 40)
 
 # game_variables
 ticks = 0
-room = 3
+room = 0
 
 player = Player()
 
