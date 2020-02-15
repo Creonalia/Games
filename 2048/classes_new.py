@@ -116,20 +116,18 @@ class Board():
 
 class Game_Mode():
 
-    def __init__(self, mode, start_value, size = 4):
+    def __init__(self, mode, start_value, increase_expression = "value * 2", size = 4):
         self.mode = mode
         self.size = size
         self.number_of_cells = size ** 2
         self.cell_size = int(800/size)
         self.start_value = start_value
         self.values = [start_value]
+        self.increase_expression = increase_expression
         for i in range(12):
             self.values.append(self.increase(self.values[-1]))
     def increase(self, value):
-        if self.mode == "Normal":
-            return value * 2
-        elif self.mode == "Eleven":
-            return value + 1
+        return eval(self.increase_expression)
 
 class Game():
     window = pygame.display.set_mode([800, 1000])

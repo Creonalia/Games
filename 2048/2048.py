@@ -1,8 +1,8 @@
 from classes_new import pygame, Game, Game_Mode
 
 normal = Game_Mode("Normal", 2)
-eleven = Game_Mode("Eleven", 1)
-game = Game(normal)
+eleven = Game_Mode("Eleven", 1, "value + 1")
+game = Game(eleven)
 game.draw()
 
 # main game loop
