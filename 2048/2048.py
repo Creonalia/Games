@@ -34,18 +34,17 @@ while running:
             else:
                 continue
             if game.board.check_can_move():
-                old_board_values = [game.board.cells[i].value for i in range(16)]
+                old_board_values = [cell.value for cell in game.board.cells]
                 game.board.move_blocks(x, positive, game)
 
                 # does not create new block if board is full or the board did not change
-                if not game.board.check_full() and old_board_values != [game.board.cells[i].value for i in range(16)]:
+                if not game.board.check_full() and old_board_values != [cell.value for cell in game.board.cells]:
                     game.board.make_new_block(game.mode)
+
             if game.score > game.high_score:
                 game.high_score = game.score
             game.draw()
             if not game.board.check_can_move():
-                game.restart()           
+                game.end_game()           
   
     game.clock.tick(30)
-# high_score
-# credits
