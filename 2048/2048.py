@@ -1,24 +1,23 @@
 from classes_new import pygame, Game, Game_Mode
 
-normal = Game_Mode("Normal", 2)
-eleven = Game_Mode("Eleven", 1, "value + 1")
-game = Game(eleven)
+normal = Game_Mode()
+eleven = Game_Mode(1, "value + 1")
+game = Game(normal)
 game.draw()
 
 # main game loop
-running = True
-while running:
+while game.state != "Quit":
     
     # event loop
     for event in pygame.event.get():
 
         # check for quit
         if event.type == pygame.QUIT:
-            running = False
+            game.state = "Quit"
             break
 
         # check player movement
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN and game.state == "Playing":
             if event.key == pygame.K_w or event.key == pygame.K_UP:
                 x = False
                 positive = False
@@ -45,6 +44,6 @@ while running:
                 game.high_score = game.score
             game.draw()
             if not game.board.check_can_move():
-                game.end_game()           
-  
+                game.lose_game()           
+
     game.clock.tick(30)
