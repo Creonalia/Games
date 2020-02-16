@@ -121,11 +121,6 @@ class Board():
                 pygame.draw.rect(game.game_surface, color, cell)
                 cell.draw_value(game.game_surface, game.font)
 
-class Button(pygame.Surface):
-
-    def __init__(self, text, y, x = 300):
-        super.__init__(x, y, 100, 50)
-
 class Game_Mode():
 
     def __init__(self, start_value = 2, increase_expression = "value * 2", size = 4):
@@ -198,6 +193,6 @@ class Game():
         self.score = 0
         self.board = Board(self.mode)
         self.state = "Playing"
-        game.draw()
+        self.draw()
     
 
