@@ -186,7 +186,7 @@ class Game():
             values = shuffled, colors = Cell.shuffled_colors
             )
         }
-    buttons = {"Restart": "Restart", "Menu": "Menu", "Quit": "Quit"}
+    buttons = ("Restart", "Menu", "Quit")
     background_color = (252, 247, 241)
     board_color = (205, 193, 181)
     dimensions = (800, 1000)

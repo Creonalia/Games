@@ -40,6 +40,6 @@ while game.state != "Quit":
                         if main_menu:
                             game.restart(Game.modes[button]) 
                         else:
-                            game.state = game.buttons[button]
+                            game.state = button
 
     game.update()
