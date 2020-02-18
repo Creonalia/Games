@@ -4,11 +4,13 @@ import pygame.freetype
 pygame.init()
 
 class Cell(pygame.Rect):
-    colors = (
+    colors = [
         (238, 228, 218), (236, 224, 202), (247, 171, 109), (245, 149, 101), 
         (245, 124, 95), (246, 93, 59), (237, 206, 113), (237, 205, 92), 
         (237, 199, 80), (237, 196, 64), (237, 193, 46), (62, 57, 51)
-        )
+        ]
+    shuffled_colors = colors[:]
+    random.shuffle(shuffled_colors)
     offset = 10
     
     def __init__(self, position, mode, value = 0):
@@ -39,6 +41,7 @@ class Board():
         self.cells = [Cell(i, mode) for i in range(self.number_of_cells)]
         self.make_new_block(mode)
         self.make_new_block(mode)
+        self.value_font = pygame.freetype.SysFont(None, mode.cell_size//3)
 
     def move_blocks(self, x, positive, game):
         """Moves all blocks in the board"""
@@ -117,28 +120,33 @@ class Board():
     
         for cell in self.cells: 
             if cell.value > 0:
-                if cell.value in game.mode.values:
-                    color = Cell.colors[game.mode.values.index(cell.value)]
+                if cell.value in game.mode.values[:12]:
+                    color = game.mode.colors[game.mode.values.index(cell.value)]
                 else:
-                    color = Cell.colors[-1]
+                    color = game.mode.colors[-1]
                 pygame.draw.rect(game.game_surface, color, cell)
-                cell.draw_value(game.game_surface, game.font)
+                cell.draw_value(game.game_surface, self.value_font)
 
 class GameMode():
 
     def __init__(
         self, start_value = 2, increase_expression = "value * 2", 
-        score_increase_expression = "current_cell.value", size = 4, win_value = None
+        score_increase_expression = "current_cell.value", size = 4, win_value = None,
+        values = None, colors = Cell.colors
         ):
         self.size = size
         self.number_of_cells = size ** 2
         self.cell_size = int(800/size)
-        self.values = [start_value]
         self.increase_expression = increase_expression
         self.score_increase_expression = score_increase_expression
-        for i in range(12):
-            self.values.append(self.increase(self.values[-1]))
+        if values:
+            self.values = values
+        else:
+            self.values = [start_value]
+            for i in range(12):
+                self.values.append(self.increase(self.values[-1]))
         self.win_value = win_value if win_value else self.values[10]
+        self.colors = colors
     
     def increase(self, value):
         """Increases cell value based on game mode"""
@@ -160,7 +168,18 @@ class Menu():
             self.surface.blit(text, position)
 
 class Game():
-    modes = {"Normal": GameMode(), "Eleven": GameMode(1, "value + 1", "2 ** current_cell.value"), "65536": GameMode(size = 5, win_value = 65536)}
+    shuffled = [i for i in range(100)]
+    random.shuffle(shuffled)
+    modes = {
+        "Normal": GameMode(), 
+        "Eleven": GameMode(1, "value + 1", "2 ** current_cell.value"), 
+        "65536": GameMode(size = 5, win_value = 65536),
+        "Confusion": GameMode(
+            1, "self.values[self.values.index(value) + 1]", 
+            "2 ** (game.mode.values.index(current_cell.value) + 1)", 
+            values = shuffled[:18], colors = Cell.shuffled_colors
+            )
+        }
     buttons = {"Restart": "Restarting", "Menu": "Menu"}
     background_color = (252, 247, 241)
     board_color = (205, 193, 181)
@@ -180,7 +199,7 @@ class Game():
         self.mode = self.modes["Normal"]
         self.state = "Menu"
         self.board = Board(self.mode) 
-        self.main_menu = Menu(self.dimensions, self.modes, 300, 200, 200, 100, 20, (0, 0))
+        self.main_menu = Menu(self.dimensions, self.modes, 250, 200, 300, 100, 20, (0, 0))
         self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 10, (500, 0))
         self.font.render_to(self.main_menu.surface, (350, 100), "2048")
         self.has_won = False
@@ -230,6 +249,9 @@ class Game():
         self.board = Board(self.mode)
         self.state = "Playing"
         self.has_won = False
+        random.shuffle(Cell.shuffled_colors)
+        random.shuffle(Game.shuffled)
+        Game.modes["Confusion"].values = Game.shuffled[:18]
  
     def move(self, x, positive):
         """Moves all blocks"""
