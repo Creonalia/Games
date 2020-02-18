@@ -34,6 +34,7 @@ while game.state != "Quit":
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if game.state == "Won":
                 game.state = "Playing"
+                
             elif game.state == "Menu" or game.state == "Playing":
                 main_menu = game.state == "Menu"
                 menu = game.main_menu if main_menu else game.game_menu

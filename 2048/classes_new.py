@@ -11,10 +11,10 @@ class Cell(pygame.Rect):
         )
     offset = 10
     
-    def __init__(self, position, size, value = 0):
-        x = (position % 4) * size + Cell.offset
-        y = (position // 4)* size + Cell.offset + 200
-        width = size - Cell.offset * 2
+    def __init__(self, position, mode, value = 0):
+        x = (position % mode.size) * mode.cell_size + Cell.offset
+        y = (position // mode.size)* mode.cell_size + Cell.offset + 200
+        width = mode.cell_size - Cell.offset * 2
         height = width
         self.value = value
         self.position = position
@@ -36,14 +36,14 @@ class Board():
         self.cell_size = mode.cell_size
         self.number_of_cells = self.size ** 2
         # creates empty board and adds 2 random blocks
-        self.cells = [Cell(i, self.cell_size) for i in range(16)]
+        self.cells = [Cell(i, mode) for i in range(self.number_of_cells)]
         self.make_new_block(mode)
         self.make_new_block(mode)
 
     def move_blocks(self, x, positive, game):
         """Moves all blocks in the board"""
         # generates indexes of cell for each row/column
-        for i in range(4):
+        for i in range(self.size):
             if x:
                 indexes = list(range(i * self.size, (i + 1) * self.size))
             else:
@@ -68,7 +68,7 @@ class Board():
                         # merges blocks
                         elif current_cell.value == neighbor.value and not has_merged:
                             current_cell.value = game.mode.increase(current_cell.value)
-                            game.score += 2 ** (game.mode.values.index(current_cell.value) + 1)
+                            game.score += eval(game.mode.score_increase_expression)
                             neighbor.value = 0
                             has_merged = True   
                         else:
@@ -80,9 +80,9 @@ class Board():
             return True
 
         # checks if adjacent cells are the same
-        for i in range(4):
+        for i in range(self.size):
             row_indexes = list(range(i * self.size, i * self.size + self.size))
-            column_indexes = list(range(i, 16, 4))
+            column_indexes = list(range(i, self.number_of_cells, self.size))
             for indexes in (row_indexes, column_indexes):
                 for j in indexes:
                     if j is indexes[0]:
@@ -100,7 +100,7 @@ class Board():
 
     def make_new_block(self, mode):
         """Makes random new block"""
-        empty_blocks = [i for i in range(self.size**2) if self.cells[i].value == 0]  
+        empty_blocks = [i for i in range(self.number_of_cells) if self.cells[i].value == 0]  
         empty_index = random.choice(empty_blocks)
         if random.randint(0, 10) == 10:
             value = mode.values[1]
@@ -126,14 +126,19 @@ class Board():
 
 class GameMode():
 
-    def __init__(self, start_value = 2, increase_expression = "value * 2", size = 4):
+    def __init__(
+        self, start_value = 2, increase_expression = "value * 2", 
+        score_increase_expression = "current_cell.value", size = 4, win_value = None
+        ):
         self.size = size
         self.number_of_cells = size ** 2
         self.cell_size = int(800/size)
         self.values = [start_value]
         self.increase_expression = increase_expression
+        self.score_increase_expression = score_increase_expression
         for i in range(12):
             self.values.append(self.increase(self.values[-1]))
+        self.win_value = win_value if win_value else self.values[10]
     
     def increase(self, value):
         """Increases cell value based on game mode"""
@@ -155,7 +160,7 @@ class Menu():
             self.surface.blit(text, position)
 
 class Game():
-    modes = {"Normal": GameMode(), "Eleven": GameMode(1, "value + 1")}
+    modes = {"Normal": GameMode(), "Eleven": GameMode(1, "value + 1", "2 ** current_cell.value"), "65536": GameMode(size = 5, win_value = 65536)}
     buttons = {"Restart": "Restarting", "Menu": "Menu"}
     background_color = (252, 247, 241)
     board_color = (205, 193, 181)
@@ -167,7 +172,7 @@ class Game():
     game_surface = pygame.Surface(dimensions)
     clock = pygame.time.Clock()
     font = pygame.freetype.SysFont(None, 50)
-
+  
     def __init__(self):
         self.score = 0
         # change high_score
@@ -176,7 +181,7 @@ class Game():
         self.state = "Menu"
         self.board = Board(self.mode) 
         self.main_menu = Menu(self.dimensions, self.modes, 300, 200, 200, 100, 20, (0, 0))
-        self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 20, (500, 0))
+        self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 10, (500, 0))
         self.font.render_to(self.main_menu.surface, (350, 100), "2048")
         self.has_won = False
   
@@ -203,7 +208,7 @@ class Game():
             
         elif self.state == "Testing":
             for cell in self.board.cells:
-                cell.value = self.mode.values[9]
+                cell.value = self.mode.win_value // 2
                 #cell.value = random.randint(0, 1000000000)
                 self.state = "Playing"
         pygame.display.flip()
@@ -245,6 +250,6 @@ class Game():
 
     def check_win(self):
         for block in self.board.cells:
-            if block.value == self.mode.values[10]:
+            if block.value == self.mode.win_value:
                 self.state = "Won"
                 self.has_won = True
