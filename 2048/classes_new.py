@@ -141,53 +141,71 @@ class GameMode():
 
 class Menu():
 
-    def __init__(self):
-        self.surface = pygame.Surface(Game.dimensions)
+    def __init__(self, menu_dimensions, button_list, x, y, width, height, offset, window_position):
+        self.surface = pygame.Surface(menu_dimensions)
         self.surface.fill(Game.background_color)
-        Game.font.render_to(self.surface, (350, 100), "2048")
         self.buttons = {}
-        y = 200
-        for mode in Game.modes:
-            self.buttons[mode] = pygame.Rect(300, y, 200, 100)
-            y += 120
-            pygame.draw.rect(self.surface, Game.board_color, self.buttons[mode])
-            text = Game.font.render(mode)[0]
-            position = text.get_rect(center = self.buttons[mode].center)
+        self.window_position = window_position
+        for button in button_list:
+            self.buttons[button] = pygame.Rect(x, y, width, height)
+            y += height + offset
+            pygame.draw.rect(self.surface, Game.board_color, self.buttons[button])
+            text = Game.font.render(button)[0]
+            position = text.get_rect(center = self.buttons[button].center)
             self.surface.blit(text, position)
 
 class Game():
     modes = {"Normal": GameMode(), "Eleven": GameMode(1, "value + 1")}
+    buttons = {"Restart": "Restarting", "Menu": "Menu"}
     background_color = (252, 247, 241)
     board_color = (205, 193, 181)
     dimensions = (800, 1000)
+
     window = pygame.display.set_mode(dimensions)
-    transparent_surface = pygame.Surface(dimensions)
-    transparent_surface.set_alpha(100)
+    transparent_surface = pygame.Surface([800, 800])
+    transparent_surface.set_alpha(150)
     game_surface = pygame.Surface(dimensions)
     clock = pygame.time.Clock()
     font = pygame.freetype.SysFont(None, 50)
 
-    def __init__(self, mode):
+    def __init__(self):
         self.score = 0
         # change high_score
         self.high_score = 0
-        self.mode = self.modes[mode]
+        self.mode = self.modes["Normal"]
         self.state = "Menu"
         self.board = Board(self.mode) 
-        self.menu = Menu()
+        self.main_menu = Menu(self.dimensions, self.modes, 300, 200, 200, 100, 20, (0, 0))
+        self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 20, (500, 0))
+        self.font.render_to(self.main_menu.surface, (350, 100), "2048")
+        self.has_won = False
   
     def update(self):
         """Draws based on current state"""
         if self.state == "Playing":
             self.draw_game()
         elif self.state == "Menu":
-            self.window.blit(self.menu.surface, (0,0))
-        elif self.state == "Lost":
+            self.window.blit(self.main_menu.surface, self.main_menu.window_position)
+
+        elif self.state == "Won" or self.state == "Lost":
+            won = self.state == "Won"
+            self.draw_game()
+            color = Cell.colors[10] if won else Cell.colors[-1]
+            self.transparent_surface.fill(color)
+            text = "You won!" if won else "You lost"
+            text = Game.font.render(text)[0]
+            position = text.get_rect(center = self.transparent_surface.get_rect().center)
+            self.window.blit(text, position)
+            self.window.blit(self.transparent_surface, (0, 200 - Cell.offset))
+        
+        elif self.state == "Restarting":
             self.restart()
-        elif self.state == "Won":
-            pass
+            
         elif self.state == "Testing":
-            self.state = "Playing"
+            for cell in self.board.cells:
+                cell.value = self.mode.values[9]
+                #cell.value = random.randint(0, 1000000000)
+                self.state = "Playing"
         pygame.display.flip()
         self.clock.tick(20)
 
@@ -197,6 +215,7 @@ class Game():
         self.board.draw_board(self)
         self.font.render_to(self.game_surface, (20, 20), f"Score: {self.score}")
         self.font.render_to(self.game_surface, (20, 80), f"High Score: {self.high_score}")
+        self.game_surface.blit(self.game_menu.surface, self.game_menu.window_position)
         self.window.blit(self.game_surface, (0, 0))
         
     def restart(self, mode = None):
@@ -205,6 +224,7 @@ class Game():
         self.score = 0
         self.board = Board(self.mode)
         self.state = "Playing"
+        self.has_won = False
  
     def move(self, x, positive):
         """Moves all blocks"""
@@ -215,9 +235,16 @@ class Game():
             # does not create new block if board is full or the board did not change
             if not self.board.check_full() and old_board_values != [cell.value for cell in self.board.cells]:
                 self.board.make_new_block(self.mode)
-
+        
         if self.score > self.high_score:
             self.high_score = self.score
         if not self.board.check_can_move():
-            self.state = "Lost"    
+            self.state = "Lost"   
+        if not self.has_won:
+            self.check_win() 
 
+    def check_win(self):
+        for block in self.board.cells:
+            if block.value == self.mode.values[10]:
+                self.state = "Won"
+                self.has_won = True

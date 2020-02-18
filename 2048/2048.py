@@ -1,6 +1,6 @@
 from classes_new import pygame, Game
 
-game = Game("Normal")
+game = Game()
 
 # main game loop
 while game.state != "Quit":
@@ -32,11 +32,17 @@ while game.state != "Quit":
             game.move(x, positive)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if game.state == "Menu":
-                for mode in game.menu.buttons:
-                    if game.menu.buttons[mode].collidepoint(pygame.mouse.get_pos()):
-                        game.restart(Game.modes[mode])
-            elif game.state == "Playing":
-                pass 
+            if game.state == "Won":
+                game.state = "Playing"
+            elif game.state == "Menu" or game.state == "Playing":
+                main_menu = game.state == "Menu"
+                menu = game.main_menu if main_menu else game.game_menu
+                for button in menu.buttons:
+                        mouse_pos = [pygame.mouse.get_pos()[i] - menu.window_position[i] for i in range(2)]
+                        if menu.buttons[button].collidepoint(mouse_pos):
+                            if main_menu:
+                                game.restart(Game.modes[button]) 
+                            else:
+                                game.state = game.buttons[button]
 
     game.update()
