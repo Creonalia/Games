@@ -27,11 +27,11 @@ class Cell(pygame.Rect):
     def __repr__(self):
         return f"<cell {self.value}, {self.x}, {self.y}, {self.width}, {self.height}>"
 
-    def draw_value(self, window, font):
+    def draw_value(self, font_size):
         """Draws the value of the block"""
-        value_text = font.render(str(self.value))[0]
+        value_text = Game.font.render(str(self.value), size=font_size)[0]
         value_position = value_text.get_rect(center = self.center)
-        window.blit(value_text, value_position)
+        Game.game_surface.blit(value_text, value_position)
               
 class Board(): 
 
@@ -128,7 +128,7 @@ class Board():
                 else:
                     color = game.mode.colors[-1]
                 pygame.draw.rect(game.game_surface, color, cell)
-                cell.draw_value(game.game_surface, self.value_font)
+                cell.draw_value(game.mode.cell_size//3)
 
 class GameMode():
 
@@ -142,7 +142,7 @@ class GameMode():
         self.cell_size = int(800/size)
         self.increase_expression = increase_expression
         self.score_increase_expression = score_increase_expression
-        with shelve.open("score.txt") as score_shelf:
+        with shelve.open("score.txt", writeback=True) as score_shelf:
             if mode not in score_shelf:
                 score_shelf[mode] = 0
             self.high_score = score_shelf[mode]
@@ -179,8 +179,10 @@ class Game():
     random.shuffle(shuffled)
     modes = {
         "Normal": GameMode("Normal"), 
-        "Eleven": GameMode("Eleven", 1, "value + 1", "2 ** current_cell.value"), 
         "65536": GameMode("65536", size = 5, win_value = 65536),
+        str(2 ** 20): GameMode(str(2 ** 20), size = 6, win_value=2 ** 20),
+        "Eleven": GameMode("Eleven", 1, "value + 1", "2 ** current_cell.value"), 
+        "Twenty": GameMode("Twenty", 1, "value + 1", "2 ** current_cell.value", win_value=20),
         "Confusion": GameMode(
             "Confusion", 1, "self.values[self.values.index(value) + 1]", 
             "2 ** (game.mode.values.index(current_cell.value) + 1)", 
@@ -217,9 +219,9 @@ class Game():
         self.mode = self.modes["Normal"]
         self.state = "Menu"
         self.board = Board(self.mode) 
-        self.main_menu = Menu(self.dimensions, self.modes, 200, 200, 400, 100, 20, (0, 0))
+        self.main_menu = Menu(self.dimensions, self.modes, 200, 150, 400, 100, 15, (0, 0))
         self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 5, (600, 0))
-        self.font.render_to(self.main_menu.surface, (350, 100), "2048")
+        self.font.render_to(self.main_menu.surface, (300, 50), "2048", size=100)
         self.has_won = False
         self.draw_end()
        
