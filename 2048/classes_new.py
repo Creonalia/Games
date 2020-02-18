@@ -216,7 +216,7 @@ class Game():
         self.mode = self.modes["Normal"]
         self.state = "Menu"
         self.board = Board(self.mode) 
-        self.main_menu = Menu(self.dimensions, self.modes, 250, 200, 300, 100, 20, (0, 0))
+        self.main_menu = Menu(self.dimensions, self.modes, 200, 200, 400, 100, 20, (0, 0))
         self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 5, (600, 0))
         self.font.render_to(self.main_menu.surface, (350, 100), "2048")
         self.has_won = False
