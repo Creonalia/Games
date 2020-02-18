@@ -137,13 +137,14 @@ class GameMode():
         score_increase_expression = "current_cell.value", size = 4, win_value = None,
         values = None, colors = Cell.colors
         ):
-        self.mode = mode
         self.size = size
         self.number_of_cells = size ** 2
         self.cell_size = int(800/size)
         self.increase_expression = increase_expression
         self.score_increase_expression = score_increase_expression
         with shelve.open("score.txt") as score_shelf:
+            if mode not in score_shelf:
+                score_shelf[mode] = 0
             self.high_score = score_shelf[mode]
         if values:
             self.values = values
@@ -311,6 +312,5 @@ class Game():
     
     def update_high_scores(self):
         with shelve.open("score.txt", writeback = True) as score_shelf:
-            for mode in self.modes:
-                score_shelf[self.mode.mode] = Game.modes[self.mode.mode].high_score
-            score_shelf.sync()
+            for mode in Game.modes:
+                score_shelf[mode] = Game.modes[mode].high_score
