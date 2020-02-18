@@ -10,6 +10,7 @@ class Cell(pygame.Rect):
         (237, 199, 80), (237, 196, 64), (237, 193, 46), (62, 57, 51)
         )
     offset = 10
+    
     def __init__(self, position, size, value = 0):
         x = (position % 4) * size + Cell.offset
         y = (position // 4)* size + Cell.offset + 200
@@ -44,9 +45,9 @@ class Board():
         # generates indexes of cell for each row/column
         for i in range(4):
             if x:
-                indexes = list(range(i * 4, i * 4 + 4))
+                indexes = list(range(i * self.size, (i + 1) * self.size))
             else:
-                indexes = list(range(i, 16, 4))
+                indexes = list(range(i, self.number_of_cells, self.size))
             if positive:
                 indexes.reverse()
 
@@ -77,6 +78,8 @@ class Board():
         """Checks if the player can move"""
         if not self.check_full():
             return True
+
+        # checks if adjacent cells are the same
         for i in range(4):
             row_indexes = list(range(i * self.size, i * self.size + self.size))
             column_indexes = list(range(i, 16, 4))
@@ -107,7 +110,7 @@ class Board():
     
     def draw_board(self, game):
         """Draws the board"""
-        pygame.draw.rect(game.game_surface, (205, 193, 181), (0, 200, 800, 800))
+        pygame.draw.rect(game.game_surface, Game.board_color, (0, 200, 800, 800))
         for i in range(0, 900, self.cell_size):
             pygame.draw.line(game.game_surface, (188, 174, 161), (i, 200), (i, 1000), Cell.offset * 2)
             pygame.draw.line(game.game_surface, (188, 174, 161), (0, i + 200), (800, i + 200), Cell.offset * 2)
@@ -121,7 +124,7 @@ class Board():
                 pygame.draw.rect(game.game_surface, color, cell)
                 cell.draw_value(game.game_surface, game.font)
 
-class Game_Mode():
+class GameMode():
 
     def __init__(self, start_value = 2, increase_expression = "value * 2", size = 4):
         self.size = size
@@ -136,42 +139,57 @@ class Game_Mode():
         """Increases cell value based on game mode"""
         return eval(self.increase_expression)
 
+class Menu():
+
+    def __init__(self):
+        self.surface = pygame.Surface(Game.dimensions)
+        self.surface.fill(Game.background_color)
+        Game.font.render_to(self.surface, (350, 100), "2048")
+        self.buttons = {}
+        y = 200
+        for mode in Game.modes:
+            self.buttons[mode] = pygame.Rect(300, y, 200, 100)
+            y += 120
+            pygame.draw.rect(self.surface, Game.board_color, self.buttons[mode])
+            text = Game.font.render(mode)[0]
+            position = text.get_rect(center = self.buttons[mode].center)
+            self.surface.blit(text, position)
+
 class Game():
+    modes = {"Normal": GameMode(), "Eleven": GameMode(1, "value + 1")}
     background_color = (252, 247, 241)
+    board_color = (205, 193, 181)
     dimensions = (800, 1000)
     window = pygame.display.set_mode(dimensions)
     transparent_surface = pygame.Surface(dimensions)
     transparent_surface.set_alpha(100)
-    top_surface = pygame.Surface(dimensions)
     game_surface = pygame.Surface(dimensions)
     clock = pygame.time.Clock()
     font = pygame.freetype.SysFont(None, 50)
+
     def __init__(self, mode):
         self.score = 0
         # change high_score
         self.high_score = 0
-        self.mode = mode
-        self.state = "Playing"
+        self.mode = self.modes[mode]
+        self.state = "Menu"
         self.board = Board(self.mode) 
-        self.menu = self.make_menu()  
-      
-    def make_menu(self):
-        self.menu = pygame.Surface(self.dimensions)
-        self.menu.fill(self.background_color)
-        self.font.render_to(self.menu, (300, 100), "2048")
-
+        self.menu = Menu()
   
-    def draw(self):
+    def update(self):
         """Draws based on current state"""
         if self.state == "Playing":
             self.draw_game()
         elif self.state == "Menu":
-            self.window.blit(self.menu, (0,0))
+            self.window.blit(self.menu.surface, (0,0))
         elif self.state == "Lost":
-            self.window.blit(self.transparent_surface)
+            self.restart()
         elif self.state == "Won":
             pass
-        self.window.blit(self.top_surface, (0,0))
+        elif self.state == "Testing":
+            self.state = "Playing"
+        pygame.display.flip()
+        self.clock.tick(20)
 
     def draw_game(self):
         """Draws board and scores"""
@@ -180,19 +198,26 @@ class Game():
         self.font.render_to(self.game_surface, (20, 20), f"Score: {self.score}")
         self.font.render_to(self.game_surface, (20, 80), f"High Score: {self.high_score}")
         self.window.blit(self.game_surface, (0, 0))
-        pygame.display.flip()
-
-    def lose_game(self):
-        self.restart()
         
-    def win_game(self):
-        pass
-
-    def restart(self):
+    def restart(self, mode = None):
         """Resets the game"""
+        self.mode = mode if mode else self.mode
         self.score = 0
         self.board = Board(self.mode)
         self.state = "Playing"
-        self.draw()
-    
+ 
+    def move(self, x, positive):
+        """Moves all blocks"""
+        if self.board.check_can_move():
+            old_board_values = [cell.value for cell in self.board.cells]
+            self.board.move_blocks(x, positive, self)
+
+            # does not create new block if board is full or the board did not change
+            if not self.board.check_full() and old_board_values != [cell.value for cell in self.board.cells]:
+                self.board.make_new_block(self.mode)
+
+        if self.score > self.high_score:
+            self.high_score = self.score
+        if not self.board.check_can_move():
+            self.state = "Lost"    
 

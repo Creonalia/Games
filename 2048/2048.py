@@ -1,9 +1,6 @@
-from classes_new import pygame, Game, Game_Mode
+from classes_new import pygame, Game
 
-normal = Game_Mode()
-eleven = Game_Mode(1, "value + 1")
-game = Game(normal)
-game.draw()
+game = Game("Normal")
 
 # main game loop
 while game.state != "Quit":
@@ -32,18 +29,14 @@ while game.state != "Quit":
                 positive = True 
             else:
                 continue
-            if game.board.check_can_move():
-                old_board_values = [cell.value for cell in game.board.cells]
-                game.board.move_blocks(x, positive, game)
+            game.move(x, positive)
 
-                # does not create new block if board is full or the board did not change
-                if not game.board.check_full() and old_board_values != [cell.value for cell in game.board.cells]:
-                    game.board.make_new_block(game.mode)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if game.state == "Menu":
+                for mode in game.menu.buttons:
+                    if game.menu.buttons[mode].collidepoint(pygame.mouse.get_pos()):
+                        game.restart(Game.modes[mode])
+            elif game.state == "Playing":
+                pass 
 
-            if game.score > game.high_score:
-                game.high_score = game.score
-            game.draw()
-            if not game.board.check_can_move():
-                game.lose_game()           
-
-    game.clock.tick(30)
+    game.update()
