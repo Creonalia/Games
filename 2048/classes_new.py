@@ -241,7 +241,7 @@ class Game():
             self.window.blit(text, position)
             self.window.blit(self.transparent_surface, (0, 200 - Cell.offset))
             wait = True if won else False 
-            self.state = "Playing"
+            self.state = "Playing" if won else "Lost"
         
         elif self.state == "Restart":
             self.restart()
@@ -284,6 +284,7 @@ class Game():
             Game.modes["Confusion"].values = Game.shuffled
             Game.modes["Confusion"].win_value = Game.modes["Confusion"].values[10]
         self.board = Board(self.mode)
+        pygame.event.clear()
 
     def move(self, x, positive):
         """Moves all blocks"""
