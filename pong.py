@@ -11,8 +11,10 @@ f = pygame.freetype.SysFont("Wingdings", 40)
 # game variables
 white = (255,255,255)
 pspeed = 10
-xspeed = random.choice([10, -10])
+xspeed = random.choice((10, -10))
 yspeed = random.randint(-10, 10) 
+while yspeed == 0:
+    yspeed = random.randint(-10, 10)
 player = pygame.Rect(10, 275, 20, 50)
 player2 = pygame.Rect(580, 275, 20, 50)
 ball = pygame.Rect(300, 300, 10, 10)
@@ -50,11 +52,13 @@ while running:
         p1 += 1  
         ball = pygame.Rect(300, 300, 10, 10)
         yspeed = random.randint(-10, 10)
-        xspeed = random.choice([10, -10])
+        xspeed = random.choice((10, -10))
     elif ball.x < 0:
         p2 += 1
         ball = pygame.Rect(300, 300, 10, 10)
         yspeed = random.randint(-10, 10)
+        while yspeed == 0:
+            yspeed = random.randint(-10, 10)
         xspeed = random.choice([10, -10])
 
     if pygame.Rect.colliderect(player, ball) or pygame.Rect.colliderect(player2, ball):
