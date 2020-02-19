@@ -18,7 +18,6 @@ def draw_move(spot):
         pygame.draw.circle(w, black, (x, y), 150, 5)
     pygame.display.flip()
 def setup():
-    global w
     w = pygame.display.set_mode([900,900])
     w.fill((255,255,255))
     pygame.draw.line(w, black, (0, 300), (900, 300), 5)
