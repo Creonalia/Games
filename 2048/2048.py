@@ -4,7 +4,7 @@ game = Game()
 
 # main game loop
 while game.state != "Quit":
-    
+
     # event loop
     for event in pygame.event.get():
 
@@ -26,20 +26,20 @@ while game.state != "Quit":
                 positive = True
             elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                 x = True
-                positive = True 
+                positive = True
             else:
                 continue
             game.move(x, positive)
 
-        elif event.type == pygame.MOUSEBUTTONDOWN:    
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             main_menu = game.state == "Menu"
             menu = game.main_menu if main_menu else game.game_menu
             for button in menu.buttons:
-                    mouse_pos = [pygame.mouse.get_pos()[i] - menu.window_position[i] for i in range(2)]
-                    if menu.buttons[button].collidepoint(mouse_pos):
-                        if main_menu:
-                            game.restart(Game.modes[button]) 
-                        else:
-                            game.state = button
+                mouse_pos = [pygame.mouse.get_pos()[i] - menu.window_position[i] for i in range(2)]
+                if menu.buttons[button].collidepoint(mouse_pos):
+                    if main_menu:
+                        game.restart(Game.modes[button])
+                    else:
+                        game.state = button
 
     game.update()

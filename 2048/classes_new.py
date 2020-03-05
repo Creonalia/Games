@@ -4,36 +4,38 @@ import pygame
 import pygame.freetype
 pygame.init()
 
+
 class Cell(pygame.Rect):
     colors = [
-        (238, 228, 218), (236, 224, 202), (247, 171, 109), (245, 149, 101), 
-        (245, 124, 95), (246, 93, 59), (237, 206, 113), (237, 205, 92), 
+        (238, 228, 218), (236, 224, 202), (247, 171, 109), (245, 149, 101),
+        (245, 124, 95), (246, 93, 59), (237, 206, 113), (237, 205, 92),
         (237, 199, 80), (237, 196, 64), (237, 193, 46), (62, 57, 51)
-        ]
+    ]
     shuffled_colors = colors[:]
     random.shuffle(shuffled_colors)
     offset = 10
-    
-    def __init__(self, position, mode, value = 0):
+
+    def __init__(self, position, mode, value=0):
         x = (position % mode.size) * mode.cell_size + Cell.offset
-        y = (position // mode.size)* mode.cell_size + Cell.offset + 200
+        y = (position // mode.size) * mode.cell_size + Cell.offset + 200
         width = mode.cell_size - Cell.offset * 2
         height = width
         self.value = value
         self.position = position
-        self.has_merged = False 
+        self.has_merged = False
         super().__init__(x, y, width, height)
-    
+
     def __repr__(self):
         return f"<cell {self.value}, {self.x}, {self.y}, {self.width}, {self.height}>"
 
     def draw_value(self, font_size):
         """Draws the value of the block"""
         value_text = Game.font.render(str(self.value), size=font_size)[0]
-        value_position = value_text.get_rect(center = self.center)
+        value_position = value_text.get_rect(center=self.center)
         Game.game_surface.blit(value_text, value_position)
 
-class Board(): 
+
+class Board():
 
     def __init__(self, mode):
         self.size = mode.size
@@ -43,7 +45,7 @@ class Board():
         self.cells = [Cell(i, mode) for i in range(self.number_of_cells)]
         self.make_new_block(mode)
         self.make_new_block(mode)
-        self.value_font = pygame.freetype.SysFont(None, mode.cell_size//3)
+        self.value_font = pygame.freetype.SysFont(None, mode.cell_size // 3)
 
     def move_blocks(self, x, positive, game):
         """Moves all blocks in the board"""
@@ -70,15 +72,17 @@ class Board():
                             current_cell.value = 0
                             j = indexes[indexes.index(j) - 1]
                             current_cell = self.cells[j]
-                            neighbor = self.cells[indexes[indexes.index(j) - 1]]
+                            neighbor = self.cells[indexes[indexes.index(
+                                j) - 1]]
                         # merges blocks
                         elif current_cell.value == neighbor.value and not current_cell.has_merged and not neighbor.has_merged:
-                            current_cell.value = game.mode.increase(current_cell.value)
+                            current_cell.value = game.mode.increase(
+                                current_cell.value)
                             game.score += eval(game.mode.score_increase_expression)
                             neighbor.value = 0
-                            current_cell.has_merged = True   
+                            current_cell.has_merged = True
                         else:
-                            break  
+                            break
 
     def check_can_move(self):
         """Checks if the player can move"""
@@ -96,7 +100,7 @@ class Board():
                     if self.cells[j].value == self.cells[indexes[indexes.index(j) - 1]].value:
                         return True
         return False
-    
+
     def check_full(self):
         """Checks if the board is full"""
         for cell in self.cells:
@@ -106,40 +110,46 @@ class Board():
 
     def make_new_block(self, mode):
         """Makes random new block"""
-        empty_blocks = [i for i in range(self.number_of_cells) if self.cells[i].value == 0]  
+        empty_blocks = [i for i in range(
+            self.number_of_cells) if self.cells[i].value == 0]
         empty_index = random.choice(empty_blocks)
         if random.randint(0, 10) == 10:
             value = mode.values[1]
         else:
             value = mode.values[0]
         self.cells[empty_index].value = value
-    
+
     def draw_board(self, game):
         """Draws the board"""
-        pygame.draw.rect(game.game_surface, Game.board_color, (0, 200, 800, 800))
+        pygame.draw.rect(game.game_surface, Game.board_color,
+                         (0, 200, 800, 800))
         for i in range(0, 900, self.cell_size):
-            pygame.draw.line(game.game_surface, (188, 174, 161), (i, 200), (i, 1000), Cell.offset * 2)
-            pygame.draw.line(game.game_surface, (188, 174, 161), (0, i + 200), (800, i + 200), Cell.offset * 2)
-    
-        for cell in self.cells: 
+            pygame.draw.line(game.game_surface, (188, 174, 161),
+                             (i, 200), (i, 1000), Cell.offset * 2)
+            pygame.draw.line(game.game_surface, (188, 174, 161),
+                             (0, i + 200), (800, i + 200), Cell.offset * 2)
+
+        for cell in self.cells:
             if cell.value > 0:
                 if cell.value in game.mode.values[:12]:
-                    color = game.mode.colors[game.mode.values.index(cell.value)]
+                    color = game.mode.colors[game.mode.values.index(
+                        cell.value)]
                 else:
                     color = game.mode.colors[-1]
                 pygame.draw.rect(game.game_surface, color, cell)
-                cell.draw_value(game.mode.cell_size//3)
+                cell.draw_value(game.mode.cell_size // 3)
+
 
 class GameMode():
 
     def __init__(
-        self, mode, start_value = 2, increase_expression = "value * 2", 
-        score_increase_expression = "current_cell.value", size = 4, win_value = None,
-        values = None, colors = Cell.colors
-        ):
+        self, mode, start_value=2, increase_expression="value * 2",
+        score_increase_expression="current_cell.value", size=4, win_value=None,
+        values=None, colors=Cell.colors
+    ):
         self.size = size
         self.number_of_cells = size ** 2
-        self.cell_size = int(800/size)
+        self.cell_size = int(800 / size)
         self.increase_expression = increase_expression
         self.score_increase_expression = score_increase_expression
         with shelve.open("score.txt", writeback=True) as score_shelf:
@@ -154,10 +164,11 @@ class GameMode():
                 self.values.append(self.increase(self.values[-1]))
         self.win_value = win_value if win_value else self.values[10]
         self.colors = colors
-    
+
     def increase(self, value):
         """Increases cell value based on game mode"""
         return eval(self.increase_expression)
+
 
 class Menu():
 
@@ -169,26 +180,28 @@ class Menu():
         for button in button_list:
             self.buttons[button] = pygame.Rect(x, y, width, height)
             y += height + offset
-            pygame.draw.rect(self.surface, Game.board_color, self.buttons[button])
+            pygame.draw.rect(self.surface, Game.board_color,
+                             self.buttons[button])
             text = Game.font.render(button)[0]
-            position = text.get_rect(center = self.buttons[button].center)
+            position = text.get_rect(center=self.buttons[button].center)
             self.surface.blit(text, position)
+
 
 class Game():
     shuffled = [i for i in range(100)]
     random.shuffle(shuffled)
     modes = {
-        "Normal": GameMode("Normal"), 
-        "65536": GameMode("65536", size = 5, win_value = 65536),
-        str(2 ** 20): GameMode(str(2 ** 20), size = 6, win_value=2 ** 20),
-        "Eleven": GameMode("Eleven", 1, "value + 1", "2 ** current_cell.value"), 
+        "Normal": GameMode("Normal"),
+        "65536": GameMode("65536", size=5, win_value=65536),
+        str(2 ** 20): GameMode(str(2 ** 20), size=6, win_value=2 ** 20),
+        "Eleven": GameMode("Eleven", 1, "value + 1", "2 ** current_cell.value"),
         "Twenty": GameMode("Twenty", 1, "value + 1", "2 ** current_cell.value", win_value=20),
         "Confusion": GameMode(
-            "Confusion", 1, "self.values[self.values.index(value) + 1]", 
-            "2 ** (game.mode.values.index(current_cell.value) + 1)", 
-            values = shuffled, colors = Cell.shuffled_colors
-            )
-        }
+            "Confusion", 1, "self.values[self.values.index(value) + 1]",
+            "2 ** (game.mode.values.index(current_cell.value) + 1)",
+            values=shuffled, colors=Cell.shuffled_colors
+        )
+    }
     buttons = ("Restart", "Menu", "Quit")
     background_color = (252, 247, 241)
     board_color = (205, 193, 181)
@@ -199,17 +212,17 @@ class Game():
     transparent_surface.set_alpha(150)
     game_surface = pygame.Surface(dimensions)
     end_surface = pygame.Surface(dimensions)
-    
+
     clock = pygame.time.Clock()
     font = pygame.freetype.SysFont(None, 50)
-    
+
     def draw_end(self):
         self.end_surface.fill(Game.background_color)
         end_text = ("Thanks for playing!", "Made by Chendi")
         y = 100
         for text in end_text:
             text = Game.font.render(text)[0]
-            position = text.get_rect(center = (400, y))
+            position = text.get_rect(center=(400, y))
             self.end_surface.blit(text, position)
             y += 100
 
@@ -218,20 +231,24 @@ class Game():
         # change high_score
         self.mode = self.modes["Normal"]
         self.state = "Menu"
-        self.board = Board(self.mode) 
-        self.main_menu = Menu(self.dimensions, self.modes, 200, 150, 400, 100, 15, (0, 0))
-        self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 5, (600, 0))
-        self.font.render_to(self.main_menu.surface, (300, 50), "2048", size=100)
+        self.board = Board(self.mode)
+        self.main_menu = Menu(self.dimensions, self.modes,
+                              200, 150, 400, 100, 15, (0, 0))
+        self.game_menu = Menu((300, 200 - Cell.offset),
+                              self.buttons, 0, 0, 200, 60, 5, (600, 0))
+        self.font.render_to(self.main_menu.surface,
+                            (300, 50), "2048", size=100)
         self.has_won = False
         self.draw_end()
-       
+
     def update(self):
         """Draws based on current state"""
         wait = False
         if self.state == "Playing":
             self.draw_game()
         elif self.state == "Menu":
-            self.window.blit(self.main_menu.surface, self.main_menu.window_position)
+            self.window.blit(self.main_menu.surface,
+                             self.main_menu.window_position)
 
         elif self.state == "Won" or self.state == "Lost":
             won = self.state == "Won"
@@ -240,42 +257,46 @@ class Game():
             self.transparent_surface.fill(color)
             text = "You won!" if won else "You lost"
             text = Game.font.render(text)[0]
-            position = text.get_rect(center = self.transparent_surface.get_rect().center)
+            position = text.get_rect(
+                center=self.transparent_surface.get_rect().center)
             self.window.blit(text, position)
             self.window.blit(self.transparent_surface, (0, 200 - Cell.offset))
-            wait = True if won else False 
+            wait = True if won else False
             self.state = "Playing" if won else "Lost"
-        
+
         elif self.state == "Restart":
             self.restart()
 
         elif self.state == "Quit":
             self.update_high_scores()
-            self.window.blit(self.end_surface, (0,0))
+            self.window.blit(self.end_surface, (0, 0))
             wait = True
 
         elif self.state == "Testing":
             for cell in self.board.cells:
                 cell.value = self.mode.win_value // 2
-                #cell.value = random.randint(0, 1000000000)
+                # cell.value = random.randint(0, 1000000000)
                 self.state = "Playing"
-        
+
         pygame.display.flip()
         if wait:
             pygame.time.wait(750)
-        
+
         self.clock.tick(20)
 
     def draw_game(self):
         """Draws board and scores"""
         self.game_surface.fill(self.background_color)
         self.board.draw_board(self)
-        self.font.render_to(self.game_surface, (20, 20), f"Score: {self.score}")
-        self.font.render_to(self.game_surface, (20, 80), f"High Score: {self.mode.high_score}")
-        self.game_surface.blit(self.game_menu.surface, self.game_menu.window_position)
+        self.font.render_to(self.game_surface, (20, 20),
+                            f"Score: {self.score}")
+        self.font.render_to(self.game_surface, (20, 80),
+                            f"High Score: {self.mode.high_score}")
+        self.game_surface.blit(self.game_menu.surface,
+                               self.game_menu.window_position)
         self.window.blit(self.game_surface, (0, 0))
-        
-    def restart(self, mode = None):
+
+    def restart(self, mode=None):
         """Resets the game"""
         self.mode = mode if mode else self.mode
         self.score = 0
@@ -298,21 +319,21 @@ class Game():
             # does not create new block if board is full or the board did not change
             if not self.board.check_full() and old_board_values != [cell.value for cell in self.board.cells]:
                 self.board.make_new_block(self.mode)
-        
+
         if self.score > self.mode.high_score:
             self.mode.high_score = self.score
         if not self.board.check_can_move():
-            self.state = "Lost"   
+            self.state = "Lost"
         if not self.has_won:
-            self.check_win() 
+            self.check_win()
 
     def check_win(self):
         for block in self.board.cells:
             if block.value == self.mode.win_value:
                 self.state = "Won"
                 self.has_won = True
-    
+
     def update_high_scores(self):
-        with shelve.open("score.txt", writeback = True) as score_shelf:
+        with shelve.open("score.txt", writeback=True) as score_shelf:
             for mode in Game.modes:
                 score_shelf[mode] = Game.modes[mode].high_score
