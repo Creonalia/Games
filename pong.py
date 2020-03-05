@@ -4,15 +4,15 @@ import random
 pygame.init()
 
 # pygame variables
-w = pygame.display.set_mode([600,600])
+w = pygame.display.set_mode([600, 600])
 c = pygame.time.Clock()
 f = pygame.freetype.SysFont("Wingdings", 40)
 
 # game variables
-white = (255,255,255)
+white = (255, 255, 255)
 pspeed = 10
 xspeed = random.choice((10, -10))
-yspeed = random.randint(-10, 10) 
+yspeed = random.randint(-10, 10)
 while yspeed == 0:
     yspeed = random.randint(-10, 10)
 player = pygame.Rect(10, 275, 20, 50)
@@ -29,7 +29,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             break
-    
+
     # paddle movement
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP]:
@@ -44,12 +44,12 @@ while running:
     if keys[pygame.K_s]:
         if player.y < 550 - pspeed:
             player.y += pspeed
-    
+
     # ball movememt
     if (ball.y > 600 or ball.y < 0):
         yspeed *= -1
     if ball.x > 600:
-        p1 += 1  
+        p1 += 1
         ball = pygame.Rect(300, 300, 10, 10)
         yspeed = random.randint(-10, 10)
         xspeed = random.choice((10, -10))
@@ -62,16 +62,16 @@ while running:
         xspeed = random.choice([10, -10])
 
     if pygame.Rect.colliderect(player, ball) or pygame.Rect.colliderect(player2, ball):
-        xspeed*= -1
+        xspeed *= -1
 
     ball.x += xspeed
     ball.y += yspeed
-    
+
     # draw
     w.fill((0, 0, 0))
     pygame.draw.rect(w, white, player)
     pygame.draw.rect(w, white, player2)
-    pygame.draw.rect(w, (150,150,150), (250, 10, 100, 50))
+    pygame.draw.rect(w, (150, 150, 150), (250, 10, 100, 50))
     f.render_to(w, (260, 13), str(p1))
     f.render_to(w, (310, 13), str(p2))
     pygame.draw.rect(w, white, ball)

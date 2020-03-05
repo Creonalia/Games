@@ -23,5 +23,5 @@ while playing:
             guess = input("Too low. Try again.\n")
 
     playing = input("Correct! Would you like to play again? Yes/No.\n").lower() == "yes"
-    
-print("Thanks for playing!")    
+
+print("Thanks for playing!")

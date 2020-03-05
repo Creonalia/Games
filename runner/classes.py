@@ -3,6 +3,7 @@ import pygame.freetype
 import random
 pygame.init()
 
+
 class Obstacle(pygame.sprite.Sprite):
 
     def __init__(self, x):
@@ -18,7 +19,7 @@ class Obstacle(pygame.sprite.Sprite):
             self.rect.top = random.choice((50, 100, 150, 200))
         self.rect = self.rect.move(-5, 0)
 
-        
+
 class Game():
     window = pygame.display.set_mode([800, 300])
     clock = pygame.time.Clock()
@@ -28,7 +29,7 @@ class Game():
     surface.set_alpha(100)
     text_surface = font.render("You lost")[0]
     surface.blit(text_surface, text_surface.get_rect(center=(400, 150)))
-    
+
     def __init__(self):
         self.obstacles = pygame.sprite.Group()
         for i in range(1, 6):
@@ -36,29 +37,29 @@ class Game():
         # create 2 players, one formal, one ducking
         self.normal_player = pygame.sprite.Sprite()
         self.normal_player.image = pygame.Surface([50, 100])
-        self.normal_player.rect = self.normal_player.image.get_rect(topleft=(50,150))
+        self.normal_player.rect = self.normal_player.image.get_rect(topleft=(50, 150))
         self.ducking_player = pygame.sprite.Sprite()
         self.ducking_player.image = pygame.Surface([50, 50])
-        self.ducking_player.rect = self.ducking_player.image.get_rect(topleft=(50,200))
+        self.ducking_player.rect = self.ducking_player.image.get_rect(topleft=(50, 200))
         self.player = pygame.sprite.GroupSingle(self.normal_player)
         self.state = "Not Playing"
         self.jumps = 15
         self.score = 0
         self.high_score = 0
         self.ticks = 0
-        
+
     def update(self):
         self.ticks += 1
         if self.state == "Playing":
-            if self.ticks%30 == 0:
+            if self.ticks % 30 == 0:
                 self.score += 1
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] or keys[pygame.K_w] and self.jumps:
                 self.player.sprite.rect = self.player.sprite.rect.move(0, -20)
                 self.jumps -= 1
             else:
-                jumps = 0
-                
+                self.jumps = 0
+
             if (keys[pygame.K_DOWN] or keys[pygame.K_s]) and self.player.sprite is self.normal_player:
                 self.ducking_player.rect.bottomleft = self.normal_player.rect.bottomleft
                 self.player.add(self.ducking_player)
@@ -67,7 +68,7 @@ class Game():
                 self.normal_player.rect.bottomleft = self.ducking_player.rect.bottomleft
                 self.player.add(self.normal_player)
             self.obstacles.update()
-            
+
             # player collisions
             self.player.sprite.rect.top += 7
             if self.player.sprite.rect.top <= 0:
@@ -80,7 +81,6 @@ class Game():
         if self.score > self.high_score:
             self.high_score = self.score
 
-            
     def draw(self):
         Game.window.fill((255, 255, 255))
         pygame.draw.rect(Game.window, (50, 10, 10), self.ground)
@@ -90,10 +90,9 @@ class Game():
         self.player.draw(Game.window)
         self.obstacles.draw(Game.window)
         if self.state == "Lost":
-            Game.window.blit(Game.surface, (0,0))
+            Game.window.blit(Game.surface, (0, 0))
         pygame.display.update()
-        
-    
+
     def reset(self):
         self.score = 0
         i = 200

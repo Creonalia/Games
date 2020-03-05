@@ -13,7 +13,7 @@ while game.state != "Quit":
                 if game.state == "Lost":
                     game.reset()
                 game.state = "Playing"
-   
+
     game.update()
     game.draw()
 
