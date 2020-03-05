@@ -32,7 +32,7 @@ class Cell(pygame.Rect):
         value_text = Game.font.render(str(self.value), size=font_size)[0]
         value_position = value_text.get_rect(center = self.center)
         Game.game_surface.blit(value_text, value_position)
-              
+
 class Board(): 
 
     def __init__(self, mode):
