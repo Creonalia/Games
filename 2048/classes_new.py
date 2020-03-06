@@ -110,13 +110,13 @@ class Board():
 
     def make_new_block(self, mode):
         """Makes random new block"""
-        empty_blocks = [i for i in range(self.number_of_cells) if self.cells[i].value == 0]
-        empty_index = random.choice(empty_blocks)
+        empty_blocks = [cell for cell in self.cells if cell.value == 0]
+        empty_cell = random.choice(empty_blocks)
         if random.randint(0, 10) == 10:
             value = mode.values[1]
         else:
             value = mode.values[0]
-        self.cells[empty_index].value = value
+        empty_cell.value = value
 
     def draw_board(self, game):
         """Draws the board"""
