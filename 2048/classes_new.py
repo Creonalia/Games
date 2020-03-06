@@ -110,8 +110,7 @@ class Board():
 
     def make_new_block(self, mode):
         """Makes random new block"""
-        empty_blocks = [i for i in range(
-            self.number_of_cells) if self.cells[i].value == 0]
+        empty_blocks = [i for i in range(self.number_of_cells) if self.cells[i].value == 0]
         empty_index = random.choice(empty_blocks)
         if random.randint(0, 10) == 10:
             value = mode.values[1]
@@ -121,8 +120,7 @@ class Board():
 
     def draw_board(self, game):
         """Draws the board"""
-        pygame.draw.rect(game.game_surface, Game.board_color,
-                         (0, 200, 800, 800))
+        pygame.draw.rect(game.game_surface, Game.board_color, (0, 200, 800, 800))
         for i in range(0, 900, self.cell_size):
             pygame.draw.line(game.game_surface, (188, 174, 161),
                              (i, 200), (i, 1000), Cell.offset * 2)
@@ -180,8 +178,7 @@ class Menu():
         for button in button_list:
             self.buttons[button] = pygame.Rect(x, y, width, height)
             y += height + offset
-            pygame.draw.rect(self.surface, Game.board_color,
-                             self.buttons[button])
+            pygame.draw.rect(self.surface, Game.board_color, self.buttons[button])
             text = Game.font.render(button)[0]
             position = text.get_rect(center=self.buttons[button].center)
             self.surface.blit(text, position)
@@ -232,10 +229,8 @@ class Game():
         self.mode = self.modes["Normal"]
         self.state = "Menu"
         self.board = Board(self.mode)
-        self.main_menu = Menu(self.dimensions, self.modes,
-                              200, 150, 400, 100, 15, (0, 0))
-        self.game_menu = Menu((300, 200 - Cell.offset),
-                              self.buttons, 0, 0, 200, 60, 5, (600, 0))
+        self.main_menu = Menu(self.dimensions, self.modes, 200, 150, 400, 100, 15, (0, 0))
+        self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 5, (600, 0))
         self.font.render_to(self.main_menu.surface,
                             (300, 50), "2048", size=100)
         self.has_won = False
@@ -247,8 +242,7 @@ class Game():
         if self.state == "Playing":
             self.draw_game()
         elif self.state == "Menu":
-            self.window.blit(self.main_menu.surface,
-                             self.main_menu.window_position)
+            self.window.blit(self.main_menu.surface, self.main_menu.window_position)
 
         elif self.state == "Won" or self.state == "Lost":
             won = self.state == "Won"
@@ -292,8 +286,7 @@ class Game():
                             f"Score: {self.score}")
         self.font.render_to(self.game_surface, (20, 80),
                             f"High Score: {self.mode.high_score}")
-        self.game_surface.blit(self.game_menu.surface,
-                               self.game_menu.window_position)
+        self.game_surface.blit(self.game_menu.surface, self.game_menu.window_position)
         self.window.blit(self.game_surface, (0, 0))
 
     def restart(self, mode=None):
