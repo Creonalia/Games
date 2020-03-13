@@ -4,6 +4,8 @@ import pygame
 import pygame.freetype
 pygame.init()
 
+score_file = "score.txt"
+
 
 class Cell(pygame.Rect):
     colors = [
@@ -144,13 +146,13 @@ class GameMode():
         self, mode, start_value=2, increase_expression="value * 2",
         score_increase_expression="current_cell.value", size=4, win_value=None,
         values=None, colors=Cell.colors
-    ):
+            ):
         self.size = size
         self.number_of_cells = size ** 2
         self.cell_size = int(800 / size)
         self.increase_expression = increase_expression
         self.score_increase_expression = score_increase_expression
-        with shelve.open("score.txt", writeback=True) as score_shelf:
+        with shelve.open(score_file, writeback=True) as score_shelf:
             if mode not in score_shelf:
                 score_shelf[mode] = 0
             self.high_score = score_shelf[mode]
@@ -213,6 +215,18 @@ class Game():
     clock = pygame.time.Clock()
     font = pygame.freetype.SysFont(None, 50)
 
+    def __init__(self):
+        self.score = 0
+        # change high_score
+        self.mode = self.modes["Normal"]
+        self.state = "Menu"
+        self.board = Board(self.mode)
+        self.main_menu = Menu(self.dimensions, self.modes, 200, 150, 400, 100, 15, (0, 0))
+        self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 5, (600, 0))
+        self.font.render_to(self.main_menu.surface, (300, 50), "2048", size=100)
+        self.has_won = False
+        self.draw_end()
+
     def draw_end(self):
         self.end_surface.fill(Game.background_color)
         end_text = ("Thanks for playing!", "Made by Chendi")
@@ -222,19 +236,6 @@ class Game():
             position = text.get_rect(center=(400, y))
             self.end_surface.blit(text, position)
             y += 100
-
-    def __init__(self):
-        self.score = 0
-        # change high_score
-        self.mode = self.modes["Normal"]
-        self.state = "Menu"
-        self.board = Board(self.mode)
-        self.main_menu = Menu(self.dimensions, self.modes, 200, 150, 400, 100, 15, (0, 0))
-        self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 5, (600, 0))
-        self.font.render_to(self.main_menu.surface,
-                            (300, 50), "2048", size=100)
-        self.has_won = False
-        self.draw_end()
 
     def update(self):
         """Draws based on current state"""
@@ -327,6 +328,6 @@ class Game():
                 self.has_won = True
 
     def update_high_scores(self):
-        with shelve.open("score.txt", writeback=True) as score_shelf:
+        with shelve.open(score_file, writeback=True) as score_shelf:
             for mode in Game.modes:
                 score_shelf[mode] = Game.modes[mode].high_score
