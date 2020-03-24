@@ -4,7 +4,7 @@ import pygame
 import pygame.freetype
 pygame.init()
 
-score_file = "score.txt"
+score_file = "score"
 
 
 class Cell(pygame.Rect):
@@ -142,14 +142,14 @@ class Board():
 class GameMode():
 
     def __init__(
-        self, mode, start_value=2, increase="normal",
+        self, mode, start_value=2, increase_type="normal",
         score_increase_expression="current_cell.value", size=4, win_value=None,
         values=None, colors=Cell.colors
             ):
         self.size = size
         self.number_of_cells = size ** 2
         self.cell_size = int(800 / size)
-        self.increase = increase
+        self.increase_type = increase_type
         self.score_increase_expression = score_increase_expression
         with shelve.open(score_file, writeback=True) as score_shelf:
             if mode not in score_shelf:
@@ -166,11 +166,11 @@ class GameMode():
 
     def increase(self, value):
         """Increases cell value based on game mode"""
-        if self.increase == "normal":
+        if self.increase_type == "normal":
             return value * 2
-        elif self.increase == "plus one":
+        elif self.increase_type == "plus one":
             return value + 1
-        elif self.increase == "random":
+        elif self.increase_type == "random":
             return self.values[self.values.index(value) + 1]
 
 
