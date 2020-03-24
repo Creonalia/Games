@@ -78,8 +78,7 @@ class Board():
                                 j) - 1]]
                         # merges blocks
                         elif current_cell.value == neighbor.value and not current_cell.has_merged and not neighbor.has_merged:
-                            current_cell.value = game.mode.increase(
-                                current_cell.value)
+                            current_cell.value = game.mode.increase(current_cell.value)
                             game.score += eval(game.mode.score_increase_expression)
                             neighbor.value = 0
                             current_cell.has_merged = True
@@ -143,14 +142,14 @@ class Board():
 class GameMode():
 
     def __init__(
-        self, mode, start_value=2, increase_expression="value * 2",
+        self, mode, start_value=2, increase="normal",
         score_increase_expression="current_cell.value", size=4, win_value=None,
         values=None, colors=Cell.colors
             ):
         self.size = size
         self.number_of_cells = size ** 2
         self.cell_size = int(800 / size)
-        self.increase_expression = increase_expression
+        self.increase = increase
         self.score_increase_expression = score_increase_expression
         with shelve.open(score_file, writeback=True) as score_shelf:
             if mode not in score_shelf:
@@ -167,7 +166,12 @@ class GameMode():
 
     def increase(self, value):
         """Increases cell value based on game mode"""
-        return eval(self.increase_expression)
+        if self.increase == "normal":
+            return value * 2
+        elif self.increase == "plus one":
+            return value + 1
+        elif self.increase == "random":
+            return self.values[self.values.index(value) + 1]
 
 
 class Menu():
@@ -193,10 +197,10 @@ class Game():
         "Normal": GameMode("Normal"),
         "65536": GameMode("65536", size=5, win_value=65536),
         str(2 ** 20): GameMode(str(2 ** 20), size=6, win_value=2 ** 20),
-        "Eleven": GameMode("Eleven", 1, "value + 1", "2 ** current_cell.value"),
-        "Twenty": GameMode("Twenty", 1, "value + 1", "2 ** current_cell.value", win_value=20),
+        "Eleven": GameMode("Eleven", 1, "plus one", "2 ** current_cell.value"),
+        "Twenty": GameMode("Twenty", 1, "plus one", "2 ** current_cell.value", win_value=20),
         "Confusion": GameMode(
-            "Confusion", 1, "self.values[self.values.index(value) + 1]",
+            "Confusion", 1, "random",
             "2 ** (game.mode.values.index(current_cell.value) + 1)",
             values=shuffled, colors=Cell.shuffled_colors
         )
