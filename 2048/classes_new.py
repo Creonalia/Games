@@ -262,12 +262,11 @@ class Game():
             self.transparent_surface.fill(color)
             text = "You won!" if won else "You lost"
             text = Game.font.render(text)[0]
-            position = text.get_rect(
-                center=self.transparent_surface.get_rect().center)
+            position = text.get_rect(center=self.transparent_surface.get_rect().center)
             self.window.blit(text, position)
             self.window.blit(self.transparent_surface, (0, 200 - Cell.offset))
             wait = won
-            self.state = "Playing" if won else "Lost"
+            if won: self.state = "Playing"
 
         elif self.state == "Restart":
             self.restart()
