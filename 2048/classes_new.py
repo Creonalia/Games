@@ -227,7 +227,6 @@ class Game():
         self.main_menu = Menu(self.dimensions, self.modes, 200, 150, 400, 100, 15, (0, 0))
         self.game_menu = Menu((300, 200 - Cell.offset), self.buttons, 0, 0, 200, 60, 5, (600, 0))
         self.font.render_to(self.main_menu.surface, (300, 50), "2048", size=100)
-        self.has_won = False
         self.draw_end()
 
     def draw_end(self):
@@ -259,7 +258,7 @@ class Game():
                 center=self.transparent_surface.get_rect().center)
             self.window.blit(text, position)
             self.window.blit(self.transparent_surface, (0, 200 - Cell.offset))
-            wait = True if won else False
+            wait = won
             self.state = "Playing" if won else "Lost"
 
         elif self.state == "Restart":
@@ -271,6 +270,8 @@ class Game():
             wait = True
 
         elif self.state == "Testing":
+            # only used for development/debugging
+            # change the starting state of the game from Menu to Testing to trigger
             for cell in self.board.cells:
                 cell.value = self.mode.win_value // 2
                 # cell.value = random.randint(0, 1000000000)
@@ -298,7 +299,6 @@ class Game():
         self.mode = mode if mode else self.mode
         self.score = 0
         self.state = "Playing"
-        self.has_won = False
         if self.mode == Game.modes["Confusion"]:
             random.shuffle(Cell.shuffled_colors)
             random.shuffle(Game.shuffled)
@@ -321,14 +321,13 @@ class Game():
             self.mode.high_score = self.score
         if not self.board.check_can_move():
             self.state = "Lost"
-        if not self.has_won:
+        if self.state != "Won":
             self.check_win()
 
     def check_win(self):
         for block in self.board.cells:
             if block.value == self.mode.win_value:
                 self.state = "Won"
-                self.has_won = True
 
     def update_high_scores(self):
         with shelve.open(score_file, writeback=True) as score_shelf:
