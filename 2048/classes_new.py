@@ -221,7 +221,6 @@ class Game():
 
     def __init__(self):
         self.score = 0
-        # change high_score
         self.mode = self.modes["Normal"]
         self.state = "Menu"
         self.board = Board(self.mode)
