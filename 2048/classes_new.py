@@ -4,8 +4,6 @@ import pygame
 import pygame.freetype
 pygame.init()
 
-score_file = "score"
-
 
 class Cell(pygame.Rect):
     colors = [
@@ -74,10 +72,12 @@ class Board():
                             current_cell.value = 0
                             j = indexes[indexes.index(j) - 1]
                             current_cell = self.cells[j]
-                            neighbor = self.cells[indexes[indexes.index(
-                                j) - 1]]
+                            neighbor = self.cells[indexes[indexes.index(j) - 1]]
                         # merges blocks
-                        elif current_cell.value == neighbor.value and not current_cell.has_merged and not neighbor.has_merged:
+                        elif (
+                                current_cell.value == neighbor.value and not
+                                current_cell.has_merged and not neighbor.has_merged
+                                ):
                             current_cell.value = game.mode.increase(current_cell.value)
                             game.score += game.mode.increase_score(current_cell.value)
                             neighbor.value = 0
@@ -149,7 +149,7 @@ class GameMode():
         self.number_of_cells = size ** 2
         self.cell_size = int(800 / size)
         self.increase_type = increase_type
-        with shelve.open(score_file, writeback=True) as score_shelf:
+        with shelve.open(Game.score_file, writeback=True) as score_shelf:
             if mode not in score_shelf:
                 score_shelf[mode] = 0
             self.high_score = score_shelf[mode]
@@ -203,6 +203,7 @@ class Menu():
 
 
 class Game():
+    score_file = "score"
     shuffled = [i for i in range(100)]
     random.shuffle(shuffled)
     modes = {
@@ -266,7 +267,8 @@ class Game():
             self.window.blit(text, position)
             self.window.blit(self.transparent_surface, (0, 200 - Cell.offset))
             wait = won
-            if won: self.state = "Playing"
+            if won:
+                self.state = "Playing"
 
         elif self.state == "Restart":
             self.restart()
@@ -334,12 +336,11 @@ class Game():
                 self.state = "Won"
 
     def update_high_scores(self):
-        with shelve.open(score_file, writeback=True) as score_shelf:
+        with shelve.open(self.score_file, writeback=True) as score_shelf:
             for mode in Game.modes:
                 score_shelf[mode] = Game.modes[mode].high_score
 
     def setup_confusion(self):
         random.shuffle(Cell.shuffled_colors)
         random.shuffle(self.shuffled)
-        #Game.modes["Confusion"].values = Game.shuffled
         Game.modes["Confusion"].win_value = Game.modes["Confusion"].values[10]
