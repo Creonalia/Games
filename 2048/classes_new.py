@@ -187,10 +187,12 @@ class GameMode():
 class Menu():
 
     def __init__(self, menu_dimensions, button_list, x, y, width, height, offset, window_position):
+        # setup the menu surface
         self.surface = pygame.Surface(menu_dimensions)
         self.surface.fill(Game.background_color)
         self.buttons = {}
         self.window_position = window_position
+        # create each button
         for button in button_list:
             self.buttons[button] = pygame.Rect(x, y, width, height)
             y += height + offset
@@ -306,10 +308,7 @@ class Game():
         self.score = 0
         self.state = "Playing"
         if self.mode == Game.modes["Confusion"]:
-            random.shuffle(Cell.shuffled_colors)
-            random.shuffle(Game.shuffled)
-            Game.modes["Confusion"].values = Game.shuffled
-            Game.modes["Confusion"].win_value = Game.modes["Confusion"].values[10]
+            self.setup_confusion()
         self.board = Board(self.mode)
         pygame.event.clear()
 
@@ -339,3 +338,9 @@ class Game():
         with shelve.open(score_file, writeback=True) as score_shelf:
             for mode in Game.modes:
                 score_shelf[mode] = Game.modes[mode].high_score
+
+    def setup_confusion(self):
+        random.shuffle(Cell.shuffled_colors)
+        random.shuffle(self.shuffled)
+        #Game.modes["Confusion"].values = Game.shuffled
+        Game.modes["Confusion"].win_value = Game.modes["Confusion"].values[10]
