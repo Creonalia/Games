@@ -1,5 +1,18 @@
 {
-    "python.pythonPath": "/usr/bin/python3.7",
+    "python.pythonPath": "/home/chendi/.local/share/virtualenvs/Games-jFWtuzZG/bin/python",
     "python.venvPath": "/home/chendi/.local/share/virtualenvs/Games-jFWtuzZG",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        ".gitignore": false,
+        "\"**/*.pyc\": {\"when\": \"$(basename).py\"}": true,
+        "**/__pycache__": true,
+        "**/.vscode": true,
+        "**/*.meta": true
+    },
+    "explorerExclude.backup": null,
 
 }
