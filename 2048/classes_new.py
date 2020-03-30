@@ -1,5 +1,5 @@
 import random
-import shelve
+# import shelve
 import pygame
 import pygame.freetype
 pygame.init()
@@ -149,10 +149,13 @@ class GameMode():
         self.number_of_cells = size ** 2
         self.cell_size = int(800 / size)
         self.increase_type = increase_type
+        """
         with shelve.open(Game.score_file, writeback=True) as score_shelf:
             if mode not in score_shelf:
                 score_shelf[mode] = 0
             self.high_score = score_shelf[mode]
+        """
+        self.high_score = 0
         if values:
             self.values = values
         else:
@@ -336,9 +339,12 @@ class Game():
                 self.state = "Won"
 
     def update_high_scores(self):
+        pass
+        """
         with shelve.open(self.score_file, writeback=True) as score_shelf:
             for mode in Game.modes:
                 score_shelf[mode] = Game.modes[mode].high_score
+        """
 
     def setup_confusion(self):
         random.shuffle(Cell.shuffled_colors)
