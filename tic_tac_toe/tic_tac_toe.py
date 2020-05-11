@@ -48,6 +48,16 @@ def cell_to_position(cell, offset=2):
     return (cell % 3) * CELL_X + offset, (cell // 3) * CELL_X + offset
 
 
+def draw_text_center(text):
+    text = font.render(text)[0]
+    position = text.get_rect(center=window.get_rect().center)
+    win_surface.blit(text, position)
+    pygame.time.wait(200)
+    window.blit(win_surface, (0, 0))
+    pygame.display.flip()
+    pygame.time.wait(500)
+
+
 pygame.display.flip()
 
 # main game loop
@@ -69,6 +79,7 @@ while running:
                 )
                 pygame.display.flip()
 
+
                 # check for win
                 winner = None
                 rows = [board[i * 3:(i + 1) * 3] for i in range(3)]
@@ -77,15 +88,10 @@ while running:
                 for thing in rows + columns + diagonals:
                     if all([i == thing[0] for i in thing]) and None not in thing:  # all aresame so they won
                         winner = "X" if thing[0] else "O"
-
+                #  checkd for tie
                 if winner:
-                    win_text = font.render(f"{winner} won")[0]
-                    win_position = win_text.get_rect(center=window.get_rect().center)
-                    win_surface.blit(win_text, win_position)
-                    pygame.time.wait(200)
-                    window.blit(win_surface, (0, 0))
-                    pygame.display.flip()
-                    pygame.time.wait(500)
+                    draw_text_center(f"{winner} won")
                     running = False
-
-
+                elif None not in board:
+                    draw_text_center(("Tie"))
+                    running = False
