@@ -1,3 +1,4 @@
+"""a pong clone"""
 import pygame
 import pygame.freetype
 import random

@@ -1,3 +1,4 @@
+"""a bad whack a mole"""
 import pygame
 import random
 pygame.init()

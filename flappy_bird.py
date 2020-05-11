@@ -1,3 +1,6 @@
+"""
+a bad flappy bird clone
+"""
 import pygame
 import pygame.freetype
 import random
@@ -62,9 +65,11 @@ while r:
     if player.y >= 400 or player.y <= -player.height:
         r = False
     for i in btl:
-        if player.x + player.height >= i.x and player.x <= i.x + width:
-            if player.y <= i.height or player.y > i.height + width - player.height:
-                r = False
+        if (
+            player.x + player.height >= i.x and player.x <= i.x + width and
+            player.y <= i.height or player.y > i.height + width - player.height
+        ):
+            r = False
 
     # draw
     w.fill((200, 220, 255))

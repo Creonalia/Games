@@ -1,3 +1,6 @@
+"""
+A number guessing game
+"""
 import random
 
 playing = True
@@ -9,7 +12,7 @@ while playing:
     while True:
         try:
             guess = int(guess)
-        except:
+        except TypeError:
             guess = input("That's not an integer. Try again.\n")
             continue
 

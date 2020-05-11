@@ -1,3 +1,4 @@
+"""a color guessing game"""
 import random
 import pygame
 pygame.init()
